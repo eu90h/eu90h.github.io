@@ -35,7 +35,7 @@ They may now use k as a key to encrypt their communications.
 
 Suppose Eve is eavesdropping on Alice and Bob's communication. Eve knows both {% raw %}$$Y_a$$ {% endraw %} and {% raw %} $$Y_b$$ {% endraw %}, in addition to q and g. In order for Eve to compute their secret key k, she must compute {% raw %} $$Y_a^{\log_g{Y_b}}\mod{q}$$ {% endraw %}. 
 
-In the measured words of Diffie and Hellman {% sidenote 1 'see the original paper [here](https://ee.stanford.edu/~hellman/publications/24.pdf).' %},
+In the measured words of [Diffie and Hellman](https://ee.stanford.edu/~hellman/publications/24.pdf),
 
 > "We thus see that if logs mod q are easily computed the sysstem can be broken. 
 > While we do not currently have a proof of the converse (i.e., that the system is secure if logs mod q are difficult to compute), neither do we see any way to compute k from {% raw %} $$Y_a$$ {% endraw %} and {% raw %} $$Y_b$$ {% endraw %} without first obtaining either a or b [the randomly selected exponents of step 1]."
