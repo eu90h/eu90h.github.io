@@ -5,8 +5,8 @@
     <description>Articles on stuff, and sometimes things</description>
     <link>/</link>
     <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 02 Sep 2015 01:30:34 -0400</pubDate>
-    <lastBuildDate>Wed, 02 Sep 2015 01:30:34 -0400</lastBuildDate>
+    <pubDate>Wed, 02 Sep 2015 01:35:26 -0400</pubDate>
+    <lastBuildDate>Wed, 02 Sep 2015 01:35:26 -0400</lastBuildDate>
     <generator>Jekyll v2.4.0</generator>
     
       <item>
@@ -48,7 +48,7 @@
 
 &lt;p&gt;Suppose Eve is eavesdropping on Alice and Bob’s communication. Eve knows both &lt;script type=&quot;math/tex&quot;&gt;Y_a&lt;/script&gt;  and  &lt;script type=&quot;math/tex&quot;&gt;Y_b&lt;/script&gt; , in addition to q and g. In order for Eve to compute their secret key k, she must compute  &lt;script type=&quot;math/tex&quot;&gt;Y_a^{\log_g{Y_b}}\mod{q}&lt;/script&gt; . &lt;/p&gt;
 
-&lt;p&gt;In the measured words of Diffie and Hellman &lt;sup class=&quot;sidenote-number&quot;&gt;1&lt;/sup&gt;&lt;span class=&quot;sidenote&quot;&gt;&lt;sup class=&quot;sidenote-number&quot;&gt;1&lt;/sup&gt; see the original paper &lt;a href=&quot;https://ee.stanford.edu/~hellman/publications/24.pdf&quot;&gt;here&lt;/a&gt;.&lt;/span&gt;,&lt;/p&gt;
+&lt;p&gt;In the measured words of &lt;a href=&quot;https://ee.stanford.edu/~hellman/publications/24.pdf&quot;&gt;Diffie and Hellman&lt;/a&gt;,&lt;/p&gt;
 
 &lt;blockquote&gt;
   &lt;p&gt;“We thus see that if logs mod q are easily computed the sysstem can be broken. &lt;br /&gt;
