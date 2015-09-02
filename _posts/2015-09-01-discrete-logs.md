@@ -15,36 +15,36 @@ How is it possible to do this in the face of an adversary who is listening to th
 
 ## Enter the Galois Field
 
-The answer comes from, perhaps suprisingly, from number theory. Under proper conditions (to be discussed), it is believed to be prohibitively difficult to compute logarithms in the finite field {% m %}GF(q) {% em %}. By exploiting this difficulty, we can share a key.
+The answer comes from, perhaps suprisingly, from number theory. Under proper conditions (to be discussed), it is believed to be prohibitively difficult to compute logarithms in the finite field GF(q). By exploiting this difficulty, we can share a key.
 
 But how does it work?
 
 ## The Process
-Let q be a prime and g be a generator for the finite field {% m %} GF(q) {% em %}.
+Let q be a prime and g be a generator for the finite field GF(q).
 
-* Alice and Bob both generate random numbers a and b, respectively, chosen uniformly from {% m %} \{1,2,...,q-1\} {% em %}. These numbers are meant to be kept secret.
+* Alice and Bob both generate random numbers a and b, respectively, chosen uniformly from {% raw %} $$ \{1,2,...,q-1\} $$ {% endraw %}. These numbers are meant to be kept secret.
 
-* Alice computes {% m %} Y_a = g^a \mod{q} {% em %} and Bob computes {% m %} Y_b = g^b \mod{q} {% em %}
+* Alice computes {% raw %} $$ Y_a = g^a \mod{q} $$ {% endraw %} and Bob computes {% raw %} $$ Y_b = g^b \mod{q} $$ {% endraw %}
 
 * Alice and Bob exchange their Y's computed in the last step, and compute their shared secret key:
-{% m %} k = Y_a^b = Y_b^a \mod{q} {% em %}.
+{% raw %} $$ k = Y_a^b = Y_b^a \mod{q} $$ {% endraw %}.
 
 They may now use k as a key to encrypt their communications.
 
 ## What Makes it Safe?
 
-Suppose Eve is eavesdropping on Alice and Bob's communication. Eve knows both {% m %} Y_a {% em %} and {% m %} Y_b {% em %}, in addition to q and g. In order for Eve to compute their secret key k, she must compute {% m %} Y_a^{\log_g{Y_b}}\mod{q} {% em %}. 
+Suppose Eve is eavesdropping on Alice and Bob's communication. Eve knows both {% raw %}$$Y_a$$ {% endraw %} and {% raw %} $$Y_b$$ {% endraw %}, in addition to q and g. In order for Eve to compute their secret key k, she must compute {% raw %} $$Y_a^{\log_g{Y_b}}\mod{q}$$ {% endraw %}. 
 
 In the measured words of Diffie and Hellman {% sidenote 1 'see the original paper [here](https://ee.stanford.edu/~hellman/publications/24.pdf).' %},
 
 > "We thus see that if logs mod q are easily computed the sysstem can be broken. 
-> While we do not currently have a proof of the converse (i.e., that the system is secure if logs mod q are difficult to compute), neither do we see any way to compute k from {% m %} Y_a {% em %} and {% m %} Y_b {% em %} without first obtaining either {% m %} a {% em %} or {% m %} b {% em %} [the randomly selected exponents of step 1]."
+> While we do not currently have a proof of the converse (i.e., that the system is secure if logs mod q are difficult to compute), neither do we see any way to compute k from {% raw %} $$Y_a$$ {% endraw %} and {% raw %} $$Y_b$$ {% endraw %} without first obtaining either a or b [the randomly selected exponents of step 1]."
 
 ## But is it really safe?
 
 The particular variant of the Diffie-Hellman protocol described above could be weak, depending on the chosen parameters. The TLS Logjam attack showed that keys generated with 512-bit primes could be bruteforced. 
 
-One characteristic of a good prime number p is p-1 having large prime factors. In 1978, [Pohlig and Hellman demonstrated](https://www-ee.stanford.edu/~hellman/publications/28.pdf) an {% m %} O(log^2{p}) {% em %} algorithm for calculating discrete logarithms when p-1 has only small prime factors.
+One characteristic of a good prime number p is p-1 having large prime factors. In 1978, [Pohlig and Hellman demonstrated](https://www-ee.stanford.edu/~hellman/publications/28.pdf) an {% raw %} $$O(log^2{p})$$ {% endraw %} algorithm for calculating discrete logarithms when p-1 has only small prime factors.
 
 The IETF has a [list](https://tools.ietf.org/html/rfc3526) of recommended prime number/generator pairs to use in Diffie-Hellman exchanges, although in light of the logjam attack, you should use >= 2048-bit primes only.
 
