@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Yet Another Post About Diffie-Hellman</title>
+  <meta name="description" content="IntroductionThe problem of sharing  a secret key over an insecure channel began receiving attention in the late 1960s, early 1970s, apparently first by the G...">
+
+
+  <link rel="stylesheet" href="/css/tufte.css">	
+  
+
+  <!-- Google Fonts loaded here -->
+  <link href='//fonts.googleapis.com/css?family=Lato:400,400italic' rel='stylesheet' type='text/css'>
+
+  <!-- Load up MathJax script if needed ... specify in /_data/options.yml file-->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+  <link rel="canonical" href="/articles/15/discrete-logs">
+  <link rel="alternate" type="application/rss+xml" title="Wonderings" href="/feed.xml" />
+</head>
+
+  <body>
+    <!--- Header and nav template site-wide -->
+<header>
+    <nav class="group">
+		<a href="/"><img class="badge" src="/assets/img/badge_1.png" alt="CH"></a>
+		<a href="/page">A Page</a>
+		<a href="/about">About</a>
+	</nav>
+</header>
+    <article>
+      <h1>Yet another post about diffie-hellman</h1>
+<p>September 1, 2015</p>
+
+
+<h2 id="introduction">Introduction</h2>
+
+<p><span class="newthought">The problem of sharing</span>  a secret key over an insecure channel began receiving attention in the late 1960s, early 1970s, apparently first by the GCHQ and later by the academic cryptographic community.</p>
+
+<p>One solution is called the Diffie-Hellman key exchange. In this scheme, a secret key is constructed by two parties (traditionally Alice and Bob) communicating over an insecure channel.</p>
+
+<p>How is it possible to do this in the face of an adversary who is listening to the messages sent between Alice and Bob?<br />
+<!--more--></p>
+
+<h2 id="enter-the-galois-field">Enter the Galois Field</h2>
+
+<p>The answer comes from, perhaps suprisingly, from number theory. Under proper conditions (to be discussed), it is believed to be prohibitively difficult to compute logarithms in the finite field <script type="math/tex">GF(q) </script>. By exploiting this difficulty, we can share a key.</p>
+
+<p>But how does it work?</p>
+
+<h2 id="the-process">The Process</h2>
+<p>Let q be a prime and g be a generator for the finite field <script type="math/tex"> GF(q) </script>.</p>
+
+<ul>
+  <li>
+    <p>Alice and Bob both generate random numbers a and b, respectively, chosen uniformly from <script type="math/tex"> \{1,2,...,q-1\} </script>. These numbers are meant to be kept secret.</p>
+  </li>
+  <li>
+    <p>Alice computes <script type="math/tex"> Y_a = g^a \mod{q} </script> and Bob computes <script type="math/tex"> Y_b = g^b \mod{q} </script></p>
+  </li>
+  <li>
+    <p>Alice and Bob exchange their Y’s computed in the last step, and compute their shared secret key:<br />
+<script type="math/tex"> k = Y_a^b = Y_b^a \mod{q} </script>.</p>
+  </li>
+</ul>
+
+<p>They may now use k as a key to encrypt their communications.</p>
+
+<h2 id="what-makes-it-safe">What Makes it Safe?</h2>
+
+<p>Suppose Eve is eavesdropping on Alice and Bob’s communication. Eve knows both <script type="math/tex"> Y_a </script> and <script type="math/tex"> Y_b </script>, in addition to q and g. In order for Eve to compute their secret key k, she must compute <script type="math/tex"> Y_a^{\log_g{Y_b}}\mod{q} </script>. </p>
+
+<p>In the measured words of Diffie and Hellman <sup class="sidenote-number">1</sup><span class="sidenote"><sup class="sidenote-number">1</sup> see the original paper <a href="https://ee.stanford.edu/~hellman/publications/24.pdf">here</a>.</span>,</p>
+
+<blockquote>
+  <p>“We thus see that if logs mod q are easily computed the sysstem can be broken. <br />
+While we do not currently have a proof of the converse (i.e., that the system is secure if logs mod q are difficult to compute), neither do we see any way to compute k from <script type="math/tex"> Y_a </script> and <script type="math/tex"> Y_b </script> without first obtaining either <script type="math/tex"> a </script> or <script type="math/tex"> b </script> [the randomly selected exponents of step 1].”</p>
+</blockquote>
+
+<h2 id="but-is-it-really-safe">But is it really safe?</h2>
+
+<p>The particular variant of the Diffie-Hellman protocol described above could be weak, depending on the chosen parameters. The TLS Logjam attack showed that keys generated with 512-bit primes could be bruteforced. </p>
+
+<p>One characteristic of a good prime number p is p-1 having large prime factors. In 1978, <a href="https://www-ee.stanford.edu/~hellman/publications/28.pdf">Pohlig and Hellman demonstrated</a> an <script type="math/tex"> O(log^2{p}) </script> algorithm for calculating discrete logarithms when p-1 has only small prime factors.</p>
+
+<p>The IETF has a <a href="https://tools.ietf.org/html/rfc3526">list</a> of recommended prime number/generator pairs to use in Diffie-Hellman exchanges, although in light of the logjam attack, you should use &gt;= 2048-bit primes only.</p>
+
+<p>These days, for maximum security, the protocol described above shouldn’t be used. Instead, you should use <a href="https://en.wikipedia.org/wiki/Elliptic_curve_Diffie%E2%80%93Hellman">elliptic curve Diffie-Hellman</a>. Regardless, the original Diffie-Hellman algorithm is an important thing to learn from.</p>
+
+<h2 id="implementation">Implementation</h2>
+
+<p>If you wish to see an implementation, see this <a href="https://gist.github.com/eu90h/9dd9c2a1051dedfd137e">gist</a></p>
+
+
+
+    </article>
+    <span class="print-footer">Yet Another Post About Diffie-Hellman - September 1, 2015 - eu90h</span>
+    <footer>
+  <ul class="footer-links group">
+    <li><a href="mailto:hate@spam.net"><span class="icon-mail"></span></a></li>    
+    
+      <li>
+        <a href="//www.twitter.com/twitter_handle"><span class="icon-twitter"></span></a>
+      </li>
+    
+      <li>
+        <a href="//plus.google.com/+googlePlusName"><span class="icon-googleplus"></span></a>
+      </li>
+    
+      <li>
+        <a href="//github.com/GithubHandle"><span class="icon-github"></span></a>
+      </li>
+    
+      <li>
+        <a href="//www.flickr.com/photos/FlickrUserID"><span class="icon-flickr"></span></a>
+      </li>
+    
+      <li>
+        <a href="/feed"><span class="icon-feed"></span></a>
+      </li>
+      
+  </ul>
+<div class="credits">
+<span>&copy; 2015 &nbsp;&nbsp;EU90H</span></br> 
+<span>This site created with the <a href="//github.com/clayh53/tufte-jekyll">Tufte theme for content rich sites </a> in <a href="//jekyllrb.com">Jekyll</a>.</span> 
+</div>  
+</footer>
+  </body>
+</html>
