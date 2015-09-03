@@ -9,7 +9,7 @@ markdown: Kramdown
 kramdown:  
   input: GFM
 markdown_ext: "markdown,mkdown,mkdn,mkd,md"
-highlighter: rouge
+highlighter: pygments
 permalink: /articles/:short_year/:title
 timezone: America/New_York
 excerpt_separator: <!--more-->  # you can specify your own separator, of course.
