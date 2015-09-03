@@ -13,14 +13,14 @@ One solution is called the Diffie-Hellman key exchange. In this scheme, a secret
 How is it possible to do this in the face of an adversary who is listening to the messages sent between Alice and Bob?
 <!--more-->
 
-## Enter the Galois Field
+## Enter Number Theory
 
-The answer comes from, perhaps suprisingly, from number theory. Under proper conditions (to be discussed), it is believed to be prohibitively difficult to compute logarithms in the finite field GF(q). By exploiting this difficulty, we can share a key.
+The answer comes from, perhaps suprisingly, from number theory. Under proper conditions (to be discussed), it is believed to be prohibitively difficult to compute logarithms in finite groups. By exploiting this difficulty, we can share a key.
 
 But how does it work?
 
 ## The Process
-Let q be a prime and g be a generator for the finite field GF(q).
+Let q be a prime and g be a generator for the multiplicative group {% raw %} $$ \mathbb{Z}^*_q $$ {% endraw %}
 
 * Alice and Bob both generate random numbers a and b, respectively, chosen uniformly from {% raw %} $$ \{1,2,...,q-1\} $$ {% endraw %}. These numbers are meant to be kept secret.
 

@@ -5,8 +5,8 @@
     <description>Articles on stuff, and sometimes things</description>
     <link>/</link>
     <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 02 Sep 2015 01:35:26 -0400</pubDate>
-    <lastBuildDate>Wed, 02 Sep 2015 01:35:26 -0400</lastBuildDate>
+    <pubDate>Thu, 03 Sep 2015 16:05:35 -0400</pubDate>
+    <lastBuildDate>Thu, 03 Sep 2015 16:05:35 -0400</lastBuildDate>
     <generator>Jekyll v2.4.0</generator>
     
       <item>
@@ -20,14 +20,14 @@
 &lt;p&gt;How is it possible to do this in the face of an adversary who is listening to the messages sent between Alice and Bob?&lt;br /&gt;
 &lt;!--more--&gt;&lt;/p&gt;
 
-&lt;h2 id=&quot;enter-the-galois-field&quot;&gt;Enter the Galois Field&lt;/h2&gt;
+&lt;h2 id=&quot;enter-number-theory&quot;&gt;Enter Number Theory&lt;/h2&gt;
 
-&lt;p&gt;The answer comes from, perhaps suprisingly, from number theory. Under proper conditions (to be discussed), it is believed to be prohibitively difficult to compute logarithms in the finite field GF(q). By exploiting this difficulty, we can share a key.&lt;/p&gt;
+&lt;p&gt;The answer comes from, perhaps suprisingly, from number theory. Under proper conditions (to be discussed), it is believed to be prohibitively difficult to compute logarithms in finite groups. By exploiting this difficulty, we can share a key.&lt;/p&gt;
 
 &lt;p&gt;But how does it work?&lt;/p&gt;
 
 &lt;h2 id=&quot;the-process&quot;&gt;The Process&lt;/h2&gt;
-&lt;p&gt;Let q be a prime and g be a generator for the finite field GF(q).&lt;/p&gt;
+&lt;p&gt;Let q be a prime and g be a generator for the multiplicative group  &lt;script type=&quot;math/tex&quot;&gt; \mathbb{Z}^*_q &lt;/script&gt; &lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;
