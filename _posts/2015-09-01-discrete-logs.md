@@ -6,7 +6,7 @@ categories: cryptography number-theory
 ---
 ## Introduction
 
-The problem of sharing a secret key over an insecure channel began receiving attention in the late 1960s, early 1970s, apparently first by the GCHQ and later by the academic cryptographic community.
+The problem of sharing a secret key over an insecure channel began receiving increased attention in the late 1960s, early 1970s, culminating in the invention of public-key cryptography, apparently first by the GCHQ and later by the academic cryptographic community.
 
 One solution is called the Diffie-Hellman key exchange. In this scheme, a secret key is constructed by two parties (traditionally Alice and Bob) communicating over an insecure channel.
 
