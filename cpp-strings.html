@@ -104,7 +104,7 @@
     	<p>
     		Now let's see how a long string is set up. In this example, the string is obtained as the first program argument, i.e. <code>argv[1]</code>
     		<br/><img src="images/argv_init.png"></img><br/>
-    		It clears 24 bytes for the string in the same manner as it did for the first string. This time, since the string's length isn't known at compile-time, a call to strlen is made. (Why strlen and not strnlen? Probably because it's hard to determine the maximum amount of bytes to possibly read. String capacities are 8 byte integers - strnlen may not even handle those sizes.)
+    		It clears 24 bytes for the string in the same manner as it did for the first string. This time, since the string's length isn't known at compile-time, a call to strlen is made.
     		This isn't so different from how the short string was setup.
     	</p>
     	<p>
