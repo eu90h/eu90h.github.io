@@ -92,12 +92,12 @@
     	</p>
     	<p>
     		When creating a short string (i.e. a string whose length is less than __min_cap == 23 bytes), a call is made to a function called <code>__set_short_size</code>. On a little-endian CPU, this function looks like:
-    		<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">__set_short_size</span>(size_type __s) {
-    	{__r_.first().__s.__size_ <span style="color: #333333">=</span> (<span style="color: #333399; font-weight: bold">unsigned</span> <span style="color: #333399; font-weight: bold">char</span>)(__s <span style="color: #333333">></span><span style="color: #333333">></span> <span style="color: #0000DD; font-weight: bold">1</span>)}
-}
+    		<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">__set_short_size</span>(size_type __s) _NOEXCEPT
+        {__r_.first().__s.__size_ <span style="color: #333333">=</span> (<span style="color: #333399; font-weight: bold">unsigned</span> <span style="color: #333399; font-weight: bold">char</span>)(__s <span style="color: #333333">&lt;&lt;</span> <span style="color: #0000DD; font-weight: bold">1</span>);}
 </pre></div>
 
-    		So the size is bit shifted to the left one place (which is to say, the size is doubled).
+
+    		So the size is bit shifted to the right one place (which is to say, the size is doubled).
     		<br/> Indeed, 0x0E = 0x07 &gt;&gt; 1.
     		Looks like I'm on to something!
     	</p>
