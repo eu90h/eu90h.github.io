@@ -121,7 +121,7 @@ Taking a look at <a href="atrhax2021/passwordvault/MainActivity.java">MainActivi
 <span style="color: #333333">}</span>
 </pre></td></tr></table></div>
 
-The decrypt function calls AES.setKey with the first parameter ("notthefl@g"), which computes the SHA-1 digest of the string. Therefore we can decrypt all the stored passwords by decrypting them with AES in ECB mode with PKCS5 padding with the given by SHA1("notthefl@g").
+The decrypt function calls AES.setKey with the first parameter ("notthefl@g"), which computes the SHA-1 digest of the string. Therefore we can decrypt all the stored passwords by decrypting them with AES in ECB mode with PKCS5 padding with the key given by SHA1("notthefl@g").
 		<h3>Reversing #1: Two's Company</h3>
 		<p>
 		We are given a 32-bit Linux ELF <a href="atrhax2021/crackme">executable</a> and asked to understand its workings well enough to create two files that, when given to the program, trigger a victory condition. I used Ghidra to analyze the file. It seems this program makes most of its function calls indirectly by looking up pointers in a table whose base address is held in ebx at call time.
