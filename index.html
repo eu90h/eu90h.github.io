@@ -1,28 +1,38 @@
-<!doctype html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>eu90h's Junk</title>
-<link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet">
-<link rel="stylesheet" type="text/css" href="styles/blog.css">
+    <title>eu90h</title>
+    <link rel="stylesheet" href="styles/modified_darcula.css">
+    <script src="js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <link rel="stylesheet" href="styles/screen_reader.css">
+    <link rel="stylesheet" href="styles/base.css">
 </head>
-
 <body>
-
-<div id="wrapper">
-	<div class="header"><h1>eu90h's Junk</h1></div>
-	<div class="post">
-		<h3>McAfee ATR CTF 2021 Writeup</h3>
-		<p>From February 5th to February 18th, 2021, McAfee's Advanced Threat Research team held a capture the flag (CTF) competition based on one held the year prior for its own employees. The challenges tested teams knowledge on topics ranging from recon, to cryptography, to rf hacking, and more. I had fun solving the challenges and learned a few things along the way. I decided to clean up the notes I had taken during the course of the competition and put them online in hopes they may be of later use.</p>
-		<p><a href="atr-ctf-2021.html">Continue Reading</a></p>
-	</div>
-	<div class="post">
-		<h3>More Than You Ever Wanted To Know About C++ String Layouts</h3>
-		<p>While working on a reverse engineering project (a malware sample written in Objective-C++), I noticed a certain motif which always appeared whenever the program was dealing with C++'s std::string objects. The motif can be seen below.
-			<br/><img src="images/string_motif.png"><imga><br/>
-			Determined to fully understand what was going on, I knew I needed to see what a std::string looks like in memory. This prompted me to dig into the internals of libc++ (the C++ standard libraries for the llvm project). Suprisingly, I came up from the depths alive - this is my story.</p>
-			<p><a href="cpp-strings.html">Continue Reading</a></p>
-	</div>
-</div>
+    <main>
+        <div class="flexor-column">
+            <div class="article-lead">
+                <h2>McAfee ATR CTF 2021 Writeup</h2>
+                    <p>
+                        From February 5th to February 18th, 2021, McAfee's Advanced Threat Research team held a capture the flag (CTF) competition based on one held the year prior for its own employees. The challenges tested teams knowledge on topics ranging from recon, to cryptography, to rf hacking, and more. I had fun solving the challenges and learned a few things along the way. I decided to clean up the notes I had taken during the course of the competition and put them online in hopes they may be of later use.
+                    </p>
+                    <p>
+                    <a class="article-continue" href="https://eu90h.github.io/atr-ctf-2021.html">
+                        continue reading . . .
+                    </a>
+                    </p>
+            </div>
+            <div class="article-lead">
+                <h2>More Than You Ever Wanted To Know About C++ String Layouts</h2>
+                    <p>
+                        While working on a reverse engineering project (a malware sample written in Objective-C++), I noticed a certain motif which always appeared whenever the program was dealing with C++'s std::string objects. The motif can be seen below.
+                    </p>
+                    <p>
+                    <a class="article-continue" href="https://eu90h.github.io/cpp-strings.html">
+                        continue reading . . .
+                    </a>
+                    </p>
+            </div>
+	    </div>
+    </main>
 </body>
 </html>

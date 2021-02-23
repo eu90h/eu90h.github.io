@@ -1,0 +1,253 @@
+a, html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p,  div.authorquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+    background: transparent;
+    position: relative;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+body, .byline, .pub-date, footer#site-footer .footer-col p, footer#site-footer .copyright, .author-website, .gsc-control-searchbox-only input.gsc-input, .search-results-container .gsc-table-result, #comments li .comment-content, .top-stories a.each-top-story .article-text, .top-stories a.each-top-story .article-text h1, .related-posts .wp_rp_content ul.related_post.wp_rp li .wp_rp_title, .promo-quote {
+    font-family: "PT Serif", "Constantia", "Lucida Bright", "Lucidabright", "Lucida Serif", "Lucida", "DejaVu Serif", "Bitstream Vera Serif", "Liberation Serif", "Georgia", serif;
+    letter-spacing: normal;
+    font-weight: normal;
+}
+
+header.article-header h1 {
+    font-size: 2.5rem;
+    line-height: 1.1;
+    margin: 0.25rem 0 0.75rem 0;
+    padding: 0;
+}
+
+.article-text h1 h2 h3 {
+    line-height: 1.1;
+    margin: 0.25rem 0 0.75rem 0;
+    padding: 0;
+}
+.article-text h1 {
+    font-size: 2rem;
+}
+
+.article-text h2 {
+    font-size: 1.7rem;
+}
+
+.article-text h3 {
+    font-size: 1.4rem;
+}
+
+.article-lead h1 h2 h3 {
+    line-height: 1.1;
+    margin: 0.25rem 0 0.75rem 0;
+    padding: 0;
+}
+.article-lead h1 {
+    font-size: 2rem;
+}
+
+.article-lead h2 {
+    font-size: 1.7rem;
+}
+
+.article-lead h3 {
+    font-size: 1.4rem;
+}
+
+h1, h2, h3 {
+    letter-spacing: -0.025em !important;
+}
+
+h1, h2, h3, form.mailing-list label, .pull-quote, .dropcap, .body-text:not(.poetry):not(.page)>p:not(.no-dropcap):first-of-type:first-letter, .asterisks+p:not(.no-dropcap):first-letter, section.body-text>.mt-image-center:first-child+p:not(.no-dropcap):first-letter, section.body-text>p:first-child+.legacy-caption+p+p:not(.no-dropcap):first-letter, .gss-container+p:not(.no-dropcap):first-letter, .search-results-container .gs-webResult.gs-result .gs-title {
+    font-family: "PT Serif", "Constantia", "Lucida Bright", "Lucidabright", "Lucida Serif", "Lucida", "DejaVu Serif", "Bitstream Vera Serif", "Liberation Serif", "Georgia", serif;
+    text-rendering: optimizeLegibility;
+    font-weight: 500;
+    line-height: 1.1;
+}
+
+button, input, select, textarea {
+    background-color: transparent;
+    border-style: none;
+    color: inherit;
+}
+
+body {
+    color: #6DB6BC;
+    background: #0E2D3E;
+    font-size: 1rem;
+    padding: 0;
+}
+
+.byline {
+    display: block;
+    padding: 0;
+    line-height: 1.2;
+    max-width: 40rem;
+    font-size: 1.1rem;
+    margin: 0.25em 0 0.5em 0;
+}
+
+.twitter-icon {
+    overflow: hidden;
+    fill: #1da1f2;
+    width: 24px;
+    height: 24px;
+}
+
+.social {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+}
+
+.content {
+    position: relative;
+    display: -webkit-flex;
+    display: flex;
+}
+
+.article-header {
+    margin: 2%;
+    margin-bottom: 1%;
+    border-bottom: 1px solid #e86051;
+}
+
+.flexor {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.flexor {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.article-text {
+    width: 71%;
+    margin: 1rem auto 2em;
+    margin-left: 5%;
+    padding: 1%;
+}
+
+.article-lead {
+    width: 90%;
+    margin: 1rem auto 2em;
+    margin-left: 5%;
+    padding: 1%;
+}
+.article-lead p, .article-lead ul, .article-lead ol, .article-lead h2, .article-lead h3, .article-lead iframe {
+    max-width: 100%;
+    margin: 0 auto 1em;
+    display: block;
+    max-width: 1000px;
+}
+
+.article-continue {
+    font-size: 30;
+}
+
+.article-text p, .article-text ul, .article-text ol, .article-text h2, .article-text h3, .article-text iframe {
+    max-width: 100%;
+    margin: 0 auto 1em;
+    display: block;
+    max-width: 1000px;
+}
+
+ol {
+    display: block;
+    list-style-type: decimal;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 40px;
+}
+
+ol.side-matter {
+    width: 29%;
+    text-align: left;
+    float: left;
+    position: relative;
+    padding-left: 1em;
+}
+
+ol.side-matter li {
+    list-style-type: decimal;
+    list-style-position: inside;
+    color: #e86051;
+    text-align: left;
+    margin-bottom: 1.5rem;
+    margin-right: 2rem;
+}
+
+footer#page-footer {
+    border-top: 1px solid #e86051;
+    background: #3A6F90;
+    padding: 1.5rem 0.5rem 0.8rem;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+a {
+    color: #c7dad4;
+    outline: none;
+    font-style: italic;
+    text-decoration: none;
+}
+
+footer a {
+    font-style: normal;
+}
+
+a:visited {
+    color: #fa614f;
+}
+
+a:focus, a:hover {
+    color: #fa614f;
+    border-bottom: 1px solid;
+}
+
+a:active {
+    color: #fa614f;
+}
+
+div.footer-copyright {
+    margin-right: 25%;
+}
+
+pre#nasm {
+    width: 50%;
+    margin-left: 25%;
+}
+
+pre#c {
+    width: 50%;
+    margin-left: 25%;
+}
+
+pre#bash {
+    width: 50%;
+    margin-left: 25%;
+}
+
+pre#gdb {
+    width: 50%;
+    margin-left: 25%;
+}
+
+pre#java {
+    width: 50%;
+    margin-left: 25%;
+}
