@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>How to Limit a Linux Process' CPU Usage Using cgroup</title>
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="styles/blog.css">
+</head>
+<body>
+<div id="wrapper">
+	<div class="header"><h1>How to Limit a Linux Process' CPU Usage</h1></div>
+	<div class="article-body">
+		<p>
+			<h3>Problem: we want to make sure that a given process cannot consume more than X% CPU.
+		</h3>
+		</p>
+		<p>
+			Some sources have recommended the nice command/syscall to do this, but this seems to be inappropriate as nice changes only the process' scheduling priority, which does not guarantee that the process will use less than some threshold of CPU time.
+			There is also the cpulimit utility by Angelo Marletta, though it now appears to be unmaintained. Taking a brief glance at the <a href="https://github.com/opsengine/cpulimit/blob/master/src/cpulimit.c#L222">code</a>, it seems like cpulimit works by letting the process run for some interval of time before pausing it, waiting and resuming the process. It accomplishes this by using the OS signal mechanism, sending SIGSTOP and SIGCONT signals to the process. According to the manpage, this can occasionally causes weirdness.
+		</p>
+		<p>
+			It seems like the best choice in 2023 is to use the Linux kernel's control group feature. This is a pseudo-filesystem that allows us to create a hierarchy of processes and attach resource controllers to process groups so as to control access to system resources like CPU, memory, I/O, etc. We can manage cgroup ourselves using standard tools (everything is a file!), but there's also a systemd way to consider. Let's first consider the DIY method.
+		</p>
+    	<p>
+    		cgroup comes in two flavors: version 1 and version 2. I'll only deal with version 2. By default, the pseudo-fs is mounted at <code>/sys/fs/cgroup</code> on most systems. It can be mounted manually with <code>mount -t cgroup2 none MOUNTPOINT</code>.
+    	</p>
+    	<p>
+    		You can see by lsing that there's a bunch of automatically generated files like <code>cgroup.controllers, cgroup.subtree_control</code>, and so on. These files tell us useful information about cgroups as well as allowing us to configure them.
+    	</p>
+    	<p>
+    		To see what resource controllers are available to a cgroup, try <code>cat /sys/fs/cgroup/cgroup.controllers</code>: you should get something like <code>cpuset cpu io memory hugetlb pids rdma misc</code>.
+			Let's make a cgroup: <code>mkdir /sys/fs/cgroup/newgroup</code>. If you try <code>ls newgroup</code>, you'll see that like above, it has been filled automatically with various files.
+		</p>
+    	<p>
+    		Let's enable the cpu resource controller on the newgroup cgroup. Before we do that, let's ensure that the cpu resource controller is available to newgroup. The result of <code>cat newgroup/cgroup.controllers</code> should contain cpu somewhere in a space-separated list of controller names.
+			If it is present, then enable the cpu resource controller by executing <code>echo "+cpu" > cgroup.subtree_control</code>.
+			If it isn't present, then check the parent cgroup (one directory up) and ensure that it has the cpu resource controller. Enable access to children cgroups by writing <code>echo "+cpu" > cgroup.subtree_control</code>. Then enable it in the newgroup cgroup.
+    	</p>
+    	<p>
+    		Once enabled, we should see the presence of various files like <code>cpu.idle, cpu.max, cpu.max.burst</code>, and more inside newgroup.
+			Processes are added to a cgroup simply by writing their pids to <code>cgroup.procs</code> Let's add our shell to newgroup: run <code>echo $$ > cgroup.procs</code>.
+			Now if you <code>cat cgroup.procs</code>, you'll see two entries: one pid for the shell and another for the cat process.
+		</p>
+    	<p>
+			Finally, let's limit the CPU bandwidth. This is done by specifying how long, in microseconds, all processes in a cgroup may run during one period, also in microseconds. The period is also configurable. First let's see what settings are there by default: <code>cat cpu.max</code> should give something like <code>max 100000</code> which suggests that any process in this cgroup can run for the entirety of a period.
+			Let's limit processes to 10% of this 100000ms period. Execute <code>echo "10000 100000" > cpu.max</code>.
+		</p>
+    	<p>We can then test it out by running <code>stress-ng --cpu-load 100 --cpu 1</code> in the shell that's inside the cgroup, and checking htop in another terminal.
+
+			When we're done, we can delete a cgroup usign <code>rmdir</code>. Note that only leaves can be deleted: if the cgroup contains children, then all children must first be removed. Furthermore, the cgroup must not have any processes in it, so you have to write the pids of any processes up to the parent's <code>cgroup.procs</code> file.
+		</p>
+		<p>			The cgroup system is a powerful Linux kernel feature that forms one of the building blocks of containers (along with namespaces and union filesystems). We can do a lot more with it than just limiting CPU!
+		</p>
+	</div>
+</div>
+</body>
+</html>
