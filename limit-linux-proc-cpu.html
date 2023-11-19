@@ -25,7 +25,7 @@
     		cgroup comes in two flavors: version 1 and version 2. I'll only deal with version 2. By default, the pseudo-fs is mounted at <code>/sys/fs/cgroup</code> on most systems. It can be mounted manually with <code>mount -t cgroup2 none MOUNTPOINT</code>.
     	</p>
     	<p>
-    		You can see by lsing that there's a bunch of automatically generated files like <code>cgroup.controllers, cgroup.subtree_control</code>, and so on. These files tell us useful information about cgroups as well as allowing us to configure them.
+    		You can see by <code>ls</code>ing that there's a bunch of automatically generated files like <code>cgroup.controllers, cgroup.subtree_control</code>, and so on. These files tell us useful information about cgroups as well as allowing us to configure them.
     	</p>
     	<p>
     		To see what resource controllers are available to a cgroup, try <code>cat /sys/fs/cgroup/cgroup.controllers</code>: you should get something like <code>cpuset cpu io memory hugetlb pids rdma misc</code>.
