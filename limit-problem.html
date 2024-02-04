@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>A Limit Problem</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto">
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <style>
+            body {
+                font-family: 'Roboto';
+                background-color: #FAF9F6;
+            }
+            #header {
+                width: 75%;
+                margin: auto auto;
+                padding-bottom: 20px;
+            }
+            #article-body {
+                width: 75%;
+                margin: auto auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="header">
+            <h1>A Limit Problem</h1>
+        </div>
+        <div id="article-body">
+            <p>A Discord user wondered how to solve the following problem: determine
+                $$
+                \lim_{n\rightarrow\infty}\sqrt[n]{10^n+9^n+8^n}.
+                $$
+            </p>
+            <h3>Solution.</h3>
+            <p>
+                Observe that $$\sqrt[n]{10^n + 9^n + 8^n} = 10\sqrt[n]{1 + \left(\frac{9}{10}\right)^n + \left(\frac{8}{10}\right)^n}
+                $$
+                For convenience, let \(a=9/10\) and \(b=8/10\). Now we have
+                $$
+                \begin{equation}
+                \begin{split}
+                \lim_{n\rightarrow\infty}\sqrt[n]{10^n+9^n+8^n} &= 10\lim_{n\rightarrow\infty}\sqrt[n]{1 + a^n + b^n} \\
+                                                                &= 10\lim_{n\rightarrow\infty}\exp\log(1+a^n+b^n)^{1/n} \\
+                                                                &= 10\exp\lim_{n\rightarrow\infty}\frac{1}{n}\log(1+a^n+b^n)
+                \end{split}
+                \end{equation}
+                $$
+                Since \(a<1\) and \(b<1\) we have \(a^n \rightarrow 0\) and \(b^n\rightarrow 0\) as \(n\rightarrow\infty\).
+                <br>
+                Now we utilize the small log approximation \(\log(1+x)\approx x\) for sufficiently small \(x\). (This can be justified by Taylor expanding \(\log(1+x)\) around \(0\).)
+                \begin{equation}
+                \begin{split}
+                10\exp\lim_{n\rightarrow\infty}\frac{1}{n}\log(1+a^n+b^n) &= 10\exp\lim_{n\rightarrow\infty}\frac{a^n+b^n}{n} \\
+                                                                            &= 10\exp(0) \\
+                                                                            &= 10
+                \end{split}
+                \end{equation}
+                \(\square\)
+            </p>
+        </div>
+    </body>
+</html>
