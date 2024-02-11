@@ -61,6 +61,20 @@
           language-servers = ["vscode-html-language-server"]
         </code>
       </p>
+      <p>For Python, there's <a href="https://github.com/astral-sh/ruff">ruff</a> (the langserver is <a
+          href="https://github.com/astral-sh/ruff-lsp">here</a>). Luckily, there are ruff nixpkgs we can use.
+        Add the <code class="inline">ruff</code> and <code class="inline">ruff-lsp</code> packages to your nix config
+        and add <br />
+        <code>
+          [language-server.python-ruff]
+          command = "ruff-lsp"
+
+          [[language]]
+          name = "python"
+          language-servers = ["python-ruff"]
+        </code> <br />
+        to your Helix <code class="inline">languages.toml</code>.
+      </p>
       <p>That's all there is to it. For more language servers and configuration information see <a
           href="https://github.com/helix-editor/helix/wiki/How-to-install-the-default-language-servers">here</a>. Just
         be mindful of the differences if you're on NixOS.</p>
