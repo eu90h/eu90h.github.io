@@ -1,0 +1,68 @@
+<rss version="2.0">
+  <channel>
+    <title>Stefan@eu90h.com's blog</title>
+    <link>https://eu90h.com</link>
+    <description>I write about Linux, programming, and mathematics.</description>
+    <item>
+      <title>What's up RSS reader?</title>
+      <link>https://mastodon.eu90h.com/@stefan</link>
+      <description>Check me out on my mastodon: https://mastodon.eu90h.com/@stefan</description>
+      <pubDate>infinity</pubDate>
+    </item>
+    <item>
+      <title>A Simple Local TODO in Fish Shell</title>
+      <link>https://eu90h.com/a-simple-local-todo-list.html</link>
+      <description>The most simple TODO system I could think of.</description>
+       <pubDate>2024-02-16</pubDate>
+    </item>
+    <item>
+      <title>Helix Language Servers &amp; NixOS</title>
+      <link>https://eu90h.com/sql-language-server-helix-nixos.html</link>
+      <description>How to configure Helix language servers on NixOS.</description>
+      <pubDate>2024-02-09</pubDate>
+    </item>
+    <item>
+      <title>A Limit Problem</title>
+      <link>https://eu90h.com/limit-problem.html</link>
+      <description>A fun little limit problem.</description>
+      <pubDate>2024-02-03</pubDate>
+    </item>
+    <item>
+      <title>Limiting a Linux Process' CPU Usage</title>
+      <description>AKA a brief intro to cgroupv2.</description>
+      <link>https://eu90h.com/limit-linux-proc-cpu.html</link>
+      <pubDate>2023-11-18</pubDate>
+    </item>
+    <item>
+      <title>Simple Exponential Smoothing with JAX</title>
+      <description>This notebook demonstrates simple exponential smooth models using JAX.</description>
+      <link>https://github.com/eu90h/python-notebooks/blob/main/Exponential%20Smoothing.ipynb</link>
+      <pubDate>2023-08-14</pubDate>
+    </item>
+
+    <item>
+      <title>Fitting an AR(1) model with JAX</title>
+      <description>This short notebook shows a simple method for fitting a first-order autoregressive process with JAX.</description>
+      <link>https://github.com/eu90h/python-notebooks/blob/main/Fitting%20an%20AR(1)%20model%20with%20JAX.ipynb</link>
+      <pubDate>2023-11-12</pubDate>
+    </item>
+    <item>
+      <title>Logistic Regression the JAX Way</title>
+      <description>This Kaggle notebook demonstrates a simple logistic regression model for the Titanic dataset using the JAX library.</description>
+      <link>https://github.com/eu90h/python-notebooks/blob/main/logistic-regression-the-jax-way.ipynb</link>
+      <pubDate>2023-08-07</pubDate>
+    </item>
+    <item>
+      <title>McAfee ATR CTF 2021 Writeup</title>
+      <description>From February 5th to February 18th, 2021, McAfee's Advanced Threat Research team held a capture the flag (CTF) competition based on one held the year prior for its own employees. The challenges tested teams knowledge on topics ranging from recon, to cryptography, to rf hacking, and more. I had fun solving the challenges and learned a few things along the way. I decided to clean up the notes I had taken during the course of the competition and put them online in hopes they may be of later use.</description>
+      <link>https://eu90h.com/atr-ctf-2021.html</link>
+      <pubDate>2021-02-20</pubDate>
+    </item>
+    <item>
+      <title>More Than You Ever Wanted To Know About C++ String Layouts</title>
+      <description>While working on a reverse engineering project (a malware sample written in Objective-C++), I noticed a certain motif which always appeared whenever the program was dealing with C++'s std::string objects.</description>
+      <link>https://eu90h.com/cpp-strings.html</link>
+      <pubDate>2017-04-08</pubDate>
+    </item>
+</channel>
+</rss>
