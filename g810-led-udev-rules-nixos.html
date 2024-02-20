@@ -5,6 +5,15 @@
     <title>Setting up g810-led udev rules on NixOS</title>
     <link rel="stylesheet" href="https://unpkg.com/normalize.css@8.0.1/normalize.css">
     <link rel="stylesheet" href="https://unpkg.com/concrete.css@2.1.1/concrete.css">
+    <style>
+      code {
+        white-space: pre;
+      }
+
+      code.inline {
+        white-space: normal;
+      }
+    </style>
   </head>
 
   <body>
@@ -13,23 +22,29 @@
       <section>
         <p>
           I have a Logitech g512 carbon keyboard and I wanted to control the LEDs on the keyboard.
-          Thankfully there's <a href="">g810-led</a> which handles this for a number of similar Logitech keyboards.
+          Thankfully there's <a href="https://github.com/MatMoul/g810-led">g810-led</a> which handles this for a number
+          of similar Logitech keyboards.
         </p>
         <p>
           It's easy to install on NixOS, just add the g810-led package to your nix config. After it's installed, you can
-          set up a profile which will be executed on startup creating the file /etc/g810-led/profile and adding
+          set up a profile which will be executed on startup creating the file <code
+            class="inline">/etc/g810-led/profile</code> and adding
+          <br />
           <code>
             fx hwave all 2
           </code>
-          for instance. You may have to create the /etc/g810-led directory if it doesn't exist.
+          <br />
+          for instance. You may have to create the <code class="inline">/etc/g810-led</code> directory if it doesn't
+          exist.
         </p>
         <p>
-          Next, it'd be nice if we didn't have to run g810-led as root. This can be solved with the provided udev rules.
+          It'd be nice if we didn't have to run g810-led as root. This can be solved with the provided udev rules.
           Returning to your nix config, add
+          <br />
           <code>
             services.udev.packages = with pkgs; [ g810-led ];
           </code>
-          and now you should be able to control the keyboard LEDs!
+          <br /> and now you should be able to control the keyboard LEDs!
         </p>
       </section>
       <footer>
