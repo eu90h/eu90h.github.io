@@ -27,7 +27,7 @@
         .config/fish/config.fish</code>: <br />
       <code>
         function todo
-        echo $argv >> ~/.todo
+          echo $argv >> ~/.todo
         end
       </code><br />
       this function appends a message to the TODO log, used like so: <pre>todo write blog post explaining system</pre>
@@ -35,7 +35,7 @@
       Now we need an easy way to read the list:
       <code>
         function ls-todo
-        cat -n ~/.todo
+          cat -n ~/.todo
         end
       </code><br />
       the -n option displays line numbers. These will be useful for specifying entries to remove once we've smashed our
@@ -43,21 +43,21 @@
       The following function deletes a line, given a line number: <br />
       <code>
         function rm-todo
-        awk "$(printf 'FNR != %s {print $0;}' $argv[1])" ~/.todo > ~/.todo_next
-        mv ~/.todo_next ~/.todo
+          awk "$(printf 'FNR != %s {print $0;}' $argv[1])" ~/.todo > ~/.todo_next
+          mv ~/.todo_next ~/.todo
         end
       </code><br />
       a final convenience command simply opens an editor on the list:<br />
       <code>
         function ed-todo
-        hx ~/.todo
+          hx ~/.todo
         end
       </code><br />
       Now to shame the user into accomplishing the tasks by displaying it back to them whenever an interactive fish
       shell session starts:<br />
       <code>
         if status is-interactive
-        ls-todo
+          ls-todo
         end
       </code><br />
     </section>
