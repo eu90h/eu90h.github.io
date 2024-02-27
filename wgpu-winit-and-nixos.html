@@ -1,0 +1,99 @@
+x<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <title>Rust, wgpu, winit, and NixOS</title>
+  <link rel="stylesheet" href="https://unpkg.com/normalize.css@8.0.1/normalize.css">
+  <link rel="stylesheet" href="https://unpkg.com/concrete.css@2.1.1/concrete.css">
+  <style>
+    code {
+      white-space: pre;
+    }
+
+    code.inline {
+      white-space: normal;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h3>Getting wgpu and winit to work on NixOs</h3>
+    <section>
+      <p>
+        I've played around with graphics programming off and on for a while without ever getting too far (but always
+        having fun!)
+        The itch presented itself once again so off I went to scratch it.
+      </p>
+      <p>
+        I decided to give <a href="https://github.com/gfx-rs/wgpu">wgpu</a> a spin. I ran into issues trying to get the
+        <a href="https://github.com/gfx-rs/wgpu/tree/trunk/examples/src/hello_triangle">hello_triangle</a> example to
+        work on NixOS and noticed that others also run into this issue, so I figured it'd be worth writing down.
+      </p>
+    </section>
+    <section>
+      <p>
+        The first problem I encountered is illustrated below:
+        <br />
+        <code>
+called `Result::unwrap()` on an `Err` value: Os(OsError { line: 80, file:
+"/home/stefan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/winit-0.29.11/src/platform_impl/linux/wayland/event_loop/mod.rs",
+error: WaylandError(Connection(NoWaylandLib)) })
+        </code>
+        <br />
+        After creating a nix-shell with the wayland build depenency then a second, related, error occurs:
+        <br />
+        <code>
+thread 'main' panicked at
+/home/stefan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wgpu-core-0.19.0/src/instance.rs:521:39:
+called `Option::unwrap()` on a `None` value
+        </code>
+        <br />
+        Finally, we have another error:
+        <br />
+        <code>
+thread 'main' panicked at
+/home/stefan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/winit-0.29.11/src/platform_impl/linux/wayland/seat/keyboard/mod.rs:315:41:
+called `Result::unwrap()` on an `Err` value: XKBNotFound
+        </code>
+        <br />
+      </p>
+    </section>
+    <section>
+      <p>
+        I was able to finally display the glorious triangle with the following nix-shell:
+        <br />
+        <code>
+{ pkgs ? import <nixpkgs> {} }:
+  pkgs.mkShell {
+    nativeBuildInputs = with pkgs.buildPackages; [
+      pkgs.wayland
+      pkgs.libxkbcommon
+      pkgs.libglvnd
+    ];
+    shellHook = ''
+      export LD_LIBRARY_PATH=${pkgs.wayland}/lib:${pkgs.libxkbcommon}/lib:${pkgs.libglvnd}/lib:$LD_LIBRARY_PATH
+    '';
+  }
+        </code>
+        <br />
+      </p>
+    </section>
+    <section>
+      <p>
+        So why does this happen at all? Why do we need to do this? It seems like the problem is that some programs try
+        to dynamically open a shared library (<a
+          href="https://www.man7.org/linux/man-pages/man3/dlopen.3.html">dlopen</a>), but can't find it on NixOS. We
+        need to set LD_LIBRARY_PATH or use the <a href="https://github.com/NixOS/patchelf">patchelf</a> utility.
+      </p>
+    </section>
+
+    <footer>
+      <a href="/index.html">home</a>
+      <a href="/about.html">about</a>
+    </footer>
+  </main>
+</body>
+
+</html>
