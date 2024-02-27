@@ -67,10 +67,10 @@ called `Result::unwrap()` on an `Err` value: XKBNotFound
         <code>
 { pkgs ? import <nixpkgs> {} }:
   pkgs.mkShell {
-    nativeBuildInputs = with pkgs.buildPackages; [
-      pkgs.wayland
-      pkgs.libxkbcommon
-      pkgs.libglvnd
+    nativeBuildInputs = with pkgs; [
+      wayland
+      libxkbcommon
+      libglvnd
     ];
     shellHook = ''
       export LD_LIBRARY_PATH=${pkgs.wayland}/lib:${pkgs.libxkbcommon}/lib:${pkgs.libglvnd}/lib:$LD_LIBRARY_PATH
