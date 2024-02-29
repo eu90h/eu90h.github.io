@@ -16,7 +16,7 @@ jobs:
       - name: Copy folder content recursively to remote
         uses: garygrossgarten/github-action-scp@release
         with:
-          local: eu90h.github.io/
+          local: /home/runner/work/eu90h/eu90h.github.io
           remote: /data/www
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USER }}
