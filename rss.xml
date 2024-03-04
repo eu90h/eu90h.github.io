@@ -11,6 +11,13 @@
       <author>Stefan</author>
     </item>
     <item>
+      <title>Setting up a Rust winit/wgpu Development Environment on Wayland under NixOS</title>
+      <link>https://eu90h.com/wgpu-winit-and-nixos.html</link>
+      <description>It can be surprisingly tough to get all the dependencies in place just to be able to create a window.</description>
+      <pubDate>2024-03-02</pubDate>
+      <author>Stefan</author>
+    </item>
+    <item>
       <title>Logitech g810 NixOS udev Rules</title>
       <link>https://eu90h.com/g810-led-udev-rules-nixos.html</link>
       <description>How to make the fancy keyboards light up.</description>
