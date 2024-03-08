@@ -7,17 +7,6 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Configuring Helix Language Servers on NixOS</title>
   <link rel="canonical" href="https://eu90h.com/sql-language-server-helix-nixos.html" />
-  <link rel="stylesheet" href="https://unpkg.com/normalize.css@8.0.1/normalize.css">
-  <link rel="stylesheet" href="https://unpkg.com/concrete.css@2.1.1/concrete.css">
-  <style>
-    code {
-      white-space: pre-line;
-    }
-
-    code.inline {
-      white-space: normal;
-    }
-  </style>
   <script>
     if (window.location.href === "https://eu90h.github.io/sql-language-server-helix-nixos.html") {
         window.location.href = "https://eu90h.com/sql-language-server-helix-nixos.html";
@@ -26,73 +15,7 @@
 </head>
 
 <body>
-  <main>
-    <section>
-      <h1>Configuring Helix Language Servers on NixOS</h1>
-      <p>I've enjoyed my experience with the <a href="">Helix</a> editor so far. It slots in nicely as a VIM
-        replacement. Getting <a href="https://langserver.org/">language servers</a> setup for Helix on <a
-          href="https://nixos.org/">NixOS</a> isn't totally obvious though, so I thought I'd document the process here.
-      </p>
-    </section>
-    <section>
-      <p>Suppose we want to install a <a href="https://github.com/joe-re/sql-language-server">SQL language server</a>.
-        On NixOS, we <a href="https://nixos.wiki/wiki/Node.js#Using_npm_install_-g_fails">can't run</a> <code
-          class="inline">npm i
-          -g</code>.</p>
-
-      <p>Instead, we can use <code class="inline">npx</code>. Run npx and inside the shell environment run <code
-          class="inline">npm i
-          sql-language-server</code>. Now in <code class="inline">~/.config/helix/languages.toml</code>, add
-        <br />
-        <code>
-          [language-server.sql-language-server]
-          command = "npx"
-          args = ["sql-language-server", "up", "--method", "stdio"]
-
-          [[language]]
-          name = "sql"
-          language-servers = ["sql-language-server"]
-        </code>
-      </p>
-    </section>
-    <section>
-      <p>As a second example, let's setup an <a href="https://github.com/hrsh7th/vscode-langservers-extracted">HTML
-          language server</a>. As before, use <code class="inline">npx</code> to execute <code class="inline">npm i
-          vscode-langservers-extracted</code>.</p>
-      <p>Add to <code class="inline">languages.toml</code> the following:<br />
-        <code>
-          [language-server.vscode-html-language-server]
-          command = "npx"
-          args = ["vscode-html-language-server", "--stdio"]
-
-          [[language]]
-          name = "html"
-          language-servers = ["vscode-html-language-server"]
-        </code>
-      </p>
-      <p>For Python, there's <a href="https://github.com/astral-sh/ruff">ruff</a> (the langserver is <a
-          href="https://github.com/astral-sh/ruff-lsp">here</a>). Luckily, there are ruff nixpkgs we can use.
-        Add the <code class="inline">ruff</code> and <code class="inline">ruff-lsp</code> packages to your nix config
-        and add <br />
-        <code>
-          [language-server.python-ruff]
-          command = "ruff-lsp"
-
-          [[language]]
-          name = "python"
-          language-servers = ["python-ruff"]
-        </code> <br />
-        to your Helix <code class="inline">languages.toml</code>.
-      </p>
-      <p>That's all there is to it. For more language servers and configuration information see <a
-          href="https://github.com/helix-editor/helix/wiki/How-to-install-the-default-language-servers">here</a>. Just
-        be mindful of the differences if you're on NixOS.</p>
-    </section>
-    <footer>
-      <a href="index.html">home</a>
-      <a href="about.html">about</a>
-    </footer>
-  </main>
+  This content has <a href="https://eu90h.com/sql-language-server-helix-nixos.html">moved</a>. Please update your bookmarks.
 </body>
 
 </html>
